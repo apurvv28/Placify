@@ -5,9 +5,10 @@ import './index.css';
 
 function App() {
   return (
-    <div className="min-h-screen bg-black overflow-x-hidden selection:bg-purple-500/30 selection:text-white pb-32">
-      <Navbar />
-      <Hero />
+    <div className="App">
+      <header className="App-header">
+        <h1>Welcome to Placify</h1>
+      </header>
     </div>
   );
 }
