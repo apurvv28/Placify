@@ -1,11 +1,13 @@
-import './App.css';
+import React from 'react';
+import Navbar from './components/Navbar';
+import Hero from './components/Hero';
+import './index.css';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <h1>Welcome to Placify</h1>
-      </header>
+    <div className="min-h-screen bg-black overflow-x-hidden selection:bg-purple-500/30 selection:text-white pb-32">
+      <Navbar />
+      <Hero />
     </div>
   );
 }
