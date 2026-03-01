@@ -1,14 +1,26 @@
 import React from 'react';
+import { BrowserRouter } from 'react-router-dom';  
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
-import './index.css';
+import ProblemSection from './components/ProblemSection';
+import HowItWorks from './components/HowItWorks';
+import SocialProof from './components/SocialProof';
+import ForSeniorSection from './components/ForSeniorSection';
+import CTA from './components/CTA';
+import Footer from './components/Footer';
 
 function App() {
   return (
-    <div className="App min-h-screen bg-black">
+    <BrowserRouter>  
       <Navbar />
       <Hero />
-    </div>
+      <ProblemSection />
+      <HowItWorks />
+      <SocialProof />
+      <ForSeniorSection />
+      <CTA />
+      <Footer />
+    </BrowserRouter>
   );
 }
 
