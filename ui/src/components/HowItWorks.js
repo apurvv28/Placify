@@ -30,7 +30,7 @@ const steps = [
 
 export default function HowItWorks() {
   return (
-    <section className="relative bg-black py-24 overflow-hidden">
+    <section className="relative bg-black py-16 md:py-24 overflow-hidden">
       {/* Background elements */}
       <div className="absolute inset-0 z-0">
         <div className="absolute top-40 right-20 w-72 h-72 bg-purple-600/20 rounded-full blur-[120px]" />
@@ -39,21 +39,21 @@ export default function HowItWorks() {
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-4">
+        <div className="text-center mb-12 md:mb-16">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mb-4">
             How{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">
               Placify
             </span>{' '}
             Works
           </h2>
-          <p className="text-lg text-gray-400 max-w-2xl mx-auto">
+          <p className="text-base md:text-lg text-gray-400 max-w-2xl mx-auto">
             From upload to insights in under 60 seconds. No sign‑up required to get your first score.
           </p>
         </div>
 
         {/* Steps with connecting line */}
-        <div className="relative flex flex-col md:flex-row justify-center items-start md:items-stretch gap-8">
+        <div className="relative flex flex-col md:flex-row justify-center items-start md:items-stretch gap-6 md:gap-8">
           {steps.map((step, index) => (
             <div key={index} className="relative flex-1 text-center md:text-left group">
               {/* Connector line (hidden on mobile) */}
@@ -62,7 +62,7 @@ export default function HowItWorks() {
               )}
 
               {/* Step card */}
-              <div className="relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 h-full hover:bg-white/10 transition-all duration-300 hover:-translate-y-2">
+              <div className="relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-5 sm:p-6 h-full hover:bg-white/10 transition-all duration-300 hover:-translate-y-2">
                 {/* Number badge */}
                 <div className="absolute -top-3 left-1/2 md:left-6 -translate-x-1/2 md:translate-x-0 w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-lg">
                   {index + 1}
@@ -75,7 +75,7 @@ export default function HowItWorks() {
                   <step.icon size={28} className="text-white" />
                 </div>
 
-                <h3 className="text-xl font-bold text-white mb-3">{step.title}</h3>
+                <h3 className="text-lg sm:text-xl font-bold text-white mb-3">{step.title}</h3>
                 <p className="text-gray-400 text-sm leading-relaxed">{step.description}</p>
               </div>
             </div>
@@ -83,7 +83,7 @@ export default function HowItWorks() {
         </div>
 
         {/* Demo hint */}
-        <div className="mt-16 text-center">
+        <div className="mt-12 md:mt-16 text-center">
           <p className="text-sm text-gray-500">
             *Premium users get industry‑specific keyword suggestions and competitor analysis.
           </p>

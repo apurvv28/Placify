@@ -61,7 +61,7 @@ export default function SocialProof() {
   }, []);
 
   return (
-    <section className="relative bg-black py-24 overflow-hidden">
+    <section className="relative bg-black py-16 md:py-24 overflow-hidden">
       <div className="absolute inset-0 z-0">
         <div className="absolute top-20 right-20 w-80 h-80 bg-indigo-600/20 rounded-full blur-[120px]" />
         <div className="absolute bottom-20 left-20 w-96 h-96 bg-purple-600/20 rounded-full blur-[150px]" />
@@ -69,23 +69,23 @@ export default function SocialProof() {
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-4">
+        <div className="text-center mb-12 md:mb-16">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mb-4">
             Trusted by{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">
               10,000+
             </span>{' '}
             Students
           </h2>
-          <p className="text-lg text-gray-400 max-w-2xl mx-auto">
+          <p className="text-base md:text-lg text-gray-400 max-w-2xl mx-auto">
             See what professionals like you are saying about Placify.
           </p>
         </div>
 
         {/* Company logos */}
-        <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12 mb-20 opacity-70">
+        <div className="flex flex-wrap justify-center items-center gap-5 sm:gap-8 md:gap-12 mb-12 md:mb-20 opacity-70">
           {logos.map((logo, idx) => (
-            <div key={idx} className="text-gray-500 text-xl font-light tracking-wider">
+            <div key={idx} className="text-gray-500 text-sm sm:text-base md:text-xl font-light tracking-wider text-center">
               {logo.name}
             </div>
           ))}
@@ -93,19 +93,19 @@ export default function SocialProof() {
 
         {/* Testimonial carousel */}
         <div className="relative max-w-3xl mx-auto">
-          <Quote className="absolute -top-6 left-0 text-indigo-500/20 w-12 h-12" />
-          <Quote className="absolute -bottom-6 right-0 text-indigo-500/20 w-12 h-12 rotate-180" />
+          <Quote className="hidden sm:block absolute -top-6 left-0 text-indigo-500/20 w-12 h-12" />
+          <Quote className="hidden sm:block absolute -bottom-6 right-0 text-indigo-500/20 w-12 h-12 rotate-180" />
 
-          <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl p-8 md:p-10">
+          <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-10">
             {/* Avatar and rating */}
-            <div className="flex items-center gap-4 mb-6">
+            <div className="flex items-center gap-3 sm:gap-4 mb-6">
               <div
-                className={`w-16 h-16 rounded-full bg-gradient-to-br ${testimonials[activeIndex].color} flex items-center justify-center text-white font-bold text-2xl shadow-lg`}
+                className={`w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br ${testimonials[activeIndex].color} flex items-center justify-center text-white font-bold text-lg sm:text-2xl shadow-lg`}
               >
                 {testimonials[activeIndex].avatar}
               </div>
               <div>
-                <h4 className="text-white font-bold text-lg">{testimonials[activeIndex].name}</h4>
+                <h4 className="text-white font-bold text-base sm:text-lg">{testimonials[activeIndex].name}</h4>
                 <p className="text-gray-400 text-sm">{testimonials[activeIndex].role}</p>
                 <div className="flex gap-1 mt-2">
                   {[...Array(5)].map((_, i) => (
@@ -120,7 +120,7 @@ export default function SocialProof() {
             </div>
 
             {/* Quote */}
-            <p className="text-gray-300 text-lg leading-relaxed">
+            <p className="text-gray-300 text-base sm:text-lg leading-relaxed">
               "{testimonials[activeIndex].content}"
             </p>
           </div>

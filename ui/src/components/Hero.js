@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Upload, X, ArrowRight, CheckCircle, FileText, Loader2, Sparkles, User } from 'lucide-react';
+import { Upload, X, ArrowRight, CheckCircle, FileText, Loader2 } from 'lucide-react';
 
 const floatingUsers = [
   { id: 1, name: 'Nisha', role: 'Software Engineer', score: '96%', position: { top: '15%', right: '28%' }, delay: '0s', duration: '8s', color: 'from-pink-500 to-rose-500' },
@@ -127,24 +127,20 @@ export default function Hero() {
         ))}
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full py-20 lg:py-0">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full py-14 sm:py-16 lg:py-0">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-12 lg:gap-8 items-center">
           
           {/* Text Content */}
-          <div className="flex flex-col items-center lg:items-start text-center lg:text-left space-y-8">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-indigo-300">
-              <Sparkles size={14} />
-              <span>Version 2.0 AI Parsing Engine Live</span>
-            </div>
+          <div className="flex flex-col items-center lg:items-start text-center lg:text-left space-y-6 sm:space-y-8">
             
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight m-0">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-extrabold tracking-tight m-0 leading-tight">
               Land Your Dream Job with <br className="hidden md:block" />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">
                 AI-Powered 
-              </span> Intelligence.
+              </span> Intelligence
             </h1>
             
-            <p className="text-lg md:text-xl text-gray-400 max-w-2xl font-light m-0">
+            <p className="text-base sm:text-lg md:text-xl text-gray-400 max-w-2xl font-light m-0">
               Get an instant ATS compatibility score and learn from successful resumes shared by peers. 
               Stop guessing, start optimizing your career path.
             </p>
@@ -152,7 +148,7 @@ export default function Hero() {
             <div className="flex flex-col sm:flex-row gap-4 w-full justify-center lg:justify-start">
               <button 
                 onClick={() => setIsModalOpen(true)}
-                className="group flex items-center justify-center gap-2 bg-white text-black hover:bg-gray-200 transition-all px-8 py-4 rounded-full text-lg font-bold shadow-[0_0_30px_rgba(255,255,255,0.2)] hover:shadow-[0_0_40px_rgba(255,255,255,0.4)] hover:-translate-y-1 border-none cursor-pointer"
+                className="group w-full sm:w-auto flex items-center justify-center gap-2 bg-white text-black hover:bg-gray-200 transition-all px-6 sm:px-8 py-3.5 sm:py-4 rounded-full text-base sm:text-lg font-bold shadow-[0_0_30px_rgba(255,255,255,0.2)] hover:shadow-[0_0_40px_rgba(255,255,255,0.4)] hover:-translate-y-1 border-none cursor-pointer"
               >
                 Analyze Your Resume for Free
                 <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
@@ -160,14 +156,14 @@ export default function Hero() {
               
               <a 
                 href="#library"
-                className="flex items-center justify-center gap-2 text-white hover:text-indigo-300 transition-colors px-8 py-4 rounded-full text-lg font-medium border border-transparent hover:border-white/10 bg-white/5 hover:bg-white/10 backdrop-blur-md"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 text-white hover:text-indigo-300 transition-colors px-6 sm:px-8 py-3.5 sm:py-4 rounded-full text-base sm:text-lg font-medium border border-transparent hover:border-white/10 bg-white/5 hover:bg-white/10 backdrop-blur-md"
                 style={{ textDecoration: 'none' }}
               >
                 Browse the Library
               </a>
             </div>
             
-            <div className="flex items-center gap-4 text-sm text-gray-500 font-medium">
+            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 sm:gap-4 text-xs sm:text-sm text-gray-500 font-medium">
               <div className="flex -space-x-2">
                 {[1, 2, 3, 4].map((i) => (
                   <div key={i} className={`w-8 h-8 rounded-full border-2 border-black bg-gradient-to-br from-indigo-${i*200} to-purple-500`} />
@@ -178,7 +174,7 @@ export default function Hero() {
           </div>
 
           {/* Abstract Visual Graphic (Right side) */}
-          <div className="relative hidden lg:block h-[600px] w-full mt-10 lg:mt-0 perspective-1000">
+          <div className="relative hidden lg:block h-[540px] xl:h-[600px] w-full mt-10 lg:mt-0 perspective-1000">
             <div className="absolute inset-0 flex items-center justify-center animate-spin-slow" style={{ animationDuration: '40s' }}>
               <div className="w-[450px] h-[450px] rounded-full border border-indigo-500/30 border-dashed" />
               <div className="absolute w-[350px] h-[350px] rounded-full border border-purple-500/30 border-dashed animate-spin-reverse-slow" style={{ animationDuration: '25s' }} />
@@ -215,7 +211,7 @@ export default function Hero() {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={closeModal} />
           
-          <div className="relative bg-[#111] border border-white/10 rounded-2xl w-full max-w-md p-8 shadow-2xl transition-all">
+          <div className="relative bg-[#111] border border-white/10 rounded-2xl w-full max-w-md p-5 sm:p-8 shadow-2xl transition-all max-h-[90vh] overflow-y-auto custom-scrollbar">
             <button 
               onClick={closeModal}
               className="absolute top-4 right-4 text-gray-400 hover:text-white transition bg-transparent border-none cursor-pointer"
@@ -228,7 +224,7 @@ export default function Hero() {
 
             {!successData ? (
               <form onSubmit={handleSubmit}>
-                <div className="border-2 border-dashed border-gray-600 rounded-xl p-8 text-center hover:border-indigo-500 transition-colors group relative cursor-pointer bg-white/5">
+                <div className="border-2 border-dashed border-gray-600 rounded-xl p-5 sm:p-8 text-center hover:border-indigo-500 transition-colors group relative cursor-pointer bg-white/5">
                   <input 
                     type="file" 
                     accept=".pdf" 

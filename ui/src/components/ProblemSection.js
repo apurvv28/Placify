@@ -30,7 +30,7 @@ const problems = [
 
 export default function ProblemSection() {
   return (
-    <section className="relative bg-black py-24 overflow-hidden">
+    <section className="relative bg-black py-16 md:py-24 overflow-hidden">
       {/* Background grid & glow (same as Hero) */}
       <div className="absolute inset-0 z-0">
         <div className="absolute top-20 left-10 w-80 h-80 bg-purple-600/20 rounded-full blur-[120px] mix-blend-screen animate-pulse" />
@@ -40,25 +40,25 @@ export default function ProblemSection() {
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section header */}
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-4">
+        <div className="text-center mb-12 md:mb-16">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mb-4">
             The{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">
               Problem
             </span>{' '}
             with Traditional Screening
           </h2>
-          <p className="text-lg text-gray-400 max-w-2xl mx-auto">
+          <p className="text-base md:text-lg text-gray-400 max-w-2xl mx-auto">
             Most resumes never reach a recruiter. Here’s why your application might be disappearing into a black hole.
           </p>
         </div>
 
         {/* Problem cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {problems.map((problem, index) => (
             <div
               key={index}
-              className="group relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_0_30px_rgba(255,255,255,0.1)]"
+              className="group relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-5 sm:p-6 hover:bg-white/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_0_30px_rgba(255,255,255,0.1)]"
             >
               {/* Icon with gradient */}
               <div
@@ -67,7 +67,7 @@ export default function ProblemSection() {
                 <problem.icon size={28} className="text-white" />
               </div>
 
-              <h3 className="text-xl font-bold text-white mb-3">{problem.title}</h3>
+              <h3 className="text-lg sm:text-xl font-bold text-white mb-3">{problem.title}</h3>
               <p className="text-gray-400 text-sm leading-relaxed">{problem.description}</p>
 
               {/* Animated underline on hover */}
@@ -77,8 +77,8 @@ export default function ProblemSection() {
         </div>
 
         {/* Additional stat / tagline */}
-        <div className="mt-16 text-center">
-          <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-white/5 border border-white/10 text-sm text-gray-300">
+        <div className="mt-12 md:mt-16 text-center">
+          <div className="inline-flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full bg-white/5 border border-white/10 text-xs sm:text-sm text-gray-300">
             <span className="text-indigo-400 font-bold">78%</span> of top companies use ATS – don’t let your resume be filtered out.
           </div>
         </div>

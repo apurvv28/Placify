@@ -24,6 +24,62 @@
   .perspective-1000 {
     perspective: 1000px;
   }
+
+  .animate-auth-float {
+    animation: auth-float 7s ease-in-out infinite;
+  }
+
+  .animate-orb-float {
+    animation: orb-float 12s ease-in-out infinite;
+  }
+
+  .animate-orb-float-delayed {
+    animation: orb-float 14s ease-in-out infinite;
+    animation-delay: 1.2s;
+  }
+
+  .auth-card-shine {
+    background: linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, 0.12) 50%, transparent 70%);
+    transform: translateX(-120%);
+    animation: card-shine 3.8s ease-in-out infinite;
+  }
+}
+
+@keyframes auth-float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes orb-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -16px, 0);
+  }
+}
+
+@keyframes card-shine {
+  0% {
+    transform: translateX(-120%);
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.35;
+  }
+  60% {
+    opacity: 0.2;
+  }
+  100% {
+    transform: translateX(140%);
+    opacity: 0;
+  }
 }
 
 :root {
