@@ -1,25 +1,17 @@
 import React from 'react';
-import { BrowserRouter } from 'react-router-dom';  
-import Navbar from './components/Navbar';
-import Hero from './components/Hero';
-import ProblemSection from './components/ProblemSection';
-import HowItWorks from './components/HowItWorks';
-import SocialProof from './components/SocialProof';
-import ForSeniorSection from './components/ForSeniorSection';
-import CTA from './components/CTA';
-import Footer from './components/Footer';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import LandingPage from './components/LandingPage';
+import AuthFlipPage from './components/auth/AuthFlipPage';
+import DashboardPage from './components/dashboard/DashboardPage';
 
 function App() {
   return (
-    <BrowserRouter>  
-      <Navbar />
-      <Hero />
-      <ProblemSection />
-      <HowItWorks />
-      <SocialProof />
-      <ForSeniorSection />
-      <CTA />
-      <Footer />
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/auth" element={<AuthFlipPage />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
+      </Routes>
     </BrowserRouter>
   );
 }

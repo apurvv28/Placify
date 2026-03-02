@@ -10,12 +10,12 @@ const footerLinks = {
 
 export default function Footer() {
   return (
-    <footer className="relative bg-black border-t border-white/10 py-16">
+    <footer className="relative bg-black border-t border-white/10 py-12 md:py-16">
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] opacity-30" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Logo and social links */}
-        <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-8 mb-12">
+        <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-8 mb-10 md:mb-12">
           <div className="text-center md:text-left">
             <a href="/" className="flex items-center gap-2 justify-center md:justify-start" style={{ textDecoration: 'none' }}>
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
@@ -70,7 +70,7 @@ export default function Footer() {
         </div>
 
         {/* Links grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-10 md:mb-12">
           {Object.entries(footerLinks).map(([category, links]) => (
             <div key={category}>
               <h4 className="text-white font-semibold mb-4">{category}</h4>
@@ -96,13 +96,13 @@ export default function Footer() {
           <div>
             <h4 className="text-white font-semibold mb-4">Stay updated</h4>
             <p className="text-sm text-gray-400 mb-3">Get tips and product updates.</p>
-            <div className="flex">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-0">
               <input
                 type="email"
                 placeholder="Your email"
-                className="flex-1 bg-white/5 border border-white/10 rounded-l-lg px-4 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                className="flex-1 bg-white/5 border border-white/10 sm:border-r-0 rounded-lg sm:rounded-r-none sm:rounded-l-lg px-4 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
               />
-              <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-r-lg text-sm font-medium transition">
+              <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg sm:rounded-l-none sm:rounded-r-lg text-sm font-medium transition">
                 Subscribe
               </button>
             </div>
