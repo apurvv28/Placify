@@ -50,55 +50,6 @@ const SECTION_LABELS = {
 
 // ─── Sub-components ─────────────────────────────────────────────────────────
 
-function ScoreGauge({ score }) {
-  const radius = 50;
-  const circumference = 2 * Math.PI * radius;
-  const dashOffset = circumference - (score / 100) * circumference;
-  const { stroke, text, label, bg } = scoreColor(score);
-
-  return (
-    <div className="rounded-xl bg-white/5 border border-white/10 p-6 flex flex-col sm:flex-row items-center gap-6">
-      <div className="relative w-32 h-32 shrink-0">
-        <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
-          <defs>
-            <linearGradient id="scoreGradGreen" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#10b981" />
-              <stop offset="100%" stopColor="#34d399" />
-            </linearGradient>
-            <linearGradient id="scoreGradYellow" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#f59e0b" />
-              <stop offset="100%" stopColor="#fbbf24" />
-            </linearGradient>
-            <linearGradient id="scoreGradRed" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#ef4444" />
-              <stop offset="100%" stopColor="#f87171" />
-            </linearGradient>
-          </defs>
-          <circle cx="60" cy="60" r={radius} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="10" />
-          <circle
-            cx="60" cy="60" r={radius} fill="none"
-            stroke={stroke} strokeWidth="10"
-            strokeDasharray={circumference}
-            strokeDashoffset={dashOffset}
-            strokeLinecap="round"
-            style={{ transition: 'stroke-dashoffset 0.8s ease' }}
-          />
-        </svg>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className={`text-2xl font-bold ${text}`}>{score}</span>
-        </div>
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-2 flex-wrap">
-          <span className={`text-lg font-semibold`}>{label}</span>
-          <span className={`px-2 py-0.5 rounded-full text-xs font-medium border ${bg}`}>ATS Score</span>
-        </div>
-        <p className="text-sm text-gray-400 leading-relaxed">{/* scoreRationale is rendered separately */}</p>
-      </div>
-    </div>
-  );
-}
-
 function SectionNotes({ sectionNotes }) {
   return (
     <div className="rounded-xl bg-white/5 border border-white/10 p-5">
