@@ -144,8 +144,8 @@ export default function DashboardHome({ userName, token }) {
           <div className="relative w-full" style={{ height: `${Math.max(520, Math.ceil(users.length / Math.ceil(Math.sqrt(users.length))) * 110 + 60)}px` }}>
             {users.map((u, idx) => {
               const pos = floatPos(idx, users.length);
-              const badge = roleBadge(u);
               const initials = u.name
+
                 .split(' ')
                 .map((w) => w[0])
                 .join('')

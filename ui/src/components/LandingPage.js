@@ -9,7 +9,7 @@ import CTA from './CTA';
 import Footer from './Footer';
 
 export default function LandingPage() {
-  return (
+  return ( 
     <>
       <Navbar />
       <Hero />

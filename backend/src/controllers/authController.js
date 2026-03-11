@@ -19,6 +19,9 @@ const sanitizeUser = (user) => ({
   studentStatus: user.studentStatus,
   onboardingCompleted: user.onboardingCompleted,
   linkedinUrl: user.linkedinUrl,
+  lastSeen: user.lastSeen,
+  isOnline: user.isOnline,
+  avatar: user.avatar,
 });
 
 const validateOnboardingPayload = ({ profileType, workingRole, studentStatus }) => {

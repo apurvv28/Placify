@@ -8,6 +8,7 @@ import ResumeBuilderSection from './sections/ResumeBuilderSection';
 import ChatSection from './sections/ChatSection';
 import PlacedResumesSection from './sections/PlacedResumesSection';
 import UserProfileSection from './sections/UserProfileSection';
+import ChatbotIcon from '../chatbot/ChatbotIcon';
 
 export default function DashboardPage() {
   const navigate = useNavigate();
@@ -222,6 +223,7 @@ export default function DashboardPage() {
           {renderSection()}
         </div>
       </main>
+      <ChatbotIcon />
     </div>
   );
 }

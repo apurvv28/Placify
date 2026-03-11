@@ -46,20 +46,24 @@
 }
 
 @keyframes auth-float {
+
   0%,
   100% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-6px);
   }
 }
 
 @keyframes orb-float {
+
   0%,
   100% {
     transform: translate3d(0, 0, 0);
   }
+
   50% {
     transform: translate3d(0, -16px, 0);
   }
@@ -70,12 +74,15 @@
     transform: translateX(-120%);
     opacity: 0;
   }
+
   30% {
     opacity: 0.35;
   }
+
   60% {
     opacity: 0.2;
   }
+
   100% {
     transform: translateX(140%);
     opacity: 0;
