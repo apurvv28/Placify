@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-const protect = (req, res, next) => {
+module.exports = async (req, res, next) => {
   const authHeader = req.headers.authorization || '';
 
   if (!authHeader.startsWith('Bearer ')) {
@@ -18,5 +18,3 @@ const protect = (req, res, next) => {
     return res.status(401).json({ message: 'Unauthorized: invalid or expired token' });
   }
 };
-
-module.exports = { protect };

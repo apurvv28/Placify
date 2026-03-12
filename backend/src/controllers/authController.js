@@ -118,10 +118,7 @@ const getCurrentUser = async (req, res, next) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    return res.status(200).json({
-      message: 'Current user fetched successfully',
-      user: sanitizeUser(user),
-    });
+    return res.status(200).json(sanitizeUser(user));
   } catch (error) {
     return next(error);
   }

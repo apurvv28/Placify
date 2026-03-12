@@ -14,8 +14,12 @@ export default function DashboardPage() {
 
   const token = localStorage.getItem('placifyToken');
   const [user, setUser] = useState(() => {
-    const userRaw = localStorage.getItem('placifyUser');
-    return userRaw ? JSON.parse(userRaw) : null;
+    try {
+      const userRaw = localStorage.getItem('placifyUser');
+      return userRaw ? JSON.parse(userRaw) : null;
+    } catch (err) {
+      return null;
+    }
   });
   const [loadingUser, setLoadingUser] = useState(true);
   const [isSavingOnboarding, setIsSavingOnboarding] = useState(false);
@@ -44,8 +48,8 @@ export default function DashboardPage() {
         if (!response.ok) throw new Error('Failed');
 
         const data = await response.json();
-        setUser(data.user);
-        localStorage.setItem('placifyUser', JSON.stringify(data.user));
+        setUser(data);
+        localStorage.setItem('placifyUser', JSON.stringify(data));
       } catch (error) {
         localStorage.removeItem('placifyToken');
         localStorage.removeItem('placifyUser');
