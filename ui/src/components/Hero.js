@@ -44,7 +44,7 @@ export default function Hero() {
 
     try {
       // Calls the Express backend on port 5000
-      const response = await fetch(\`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/parse-resume\`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/parse-resume`, {
         method: 'POST',
         body: formData,
       });

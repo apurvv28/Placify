@@ -40,7 +40,7 @@ export default function ChatSection() {
   // Fetch all users on mount
   const fetchUsers = React.useCallback(async () => {
     try {
-      const res = await fetch(\`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/users\`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/users`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -71,14 +71,14 @@ export default function ChatSection() {
     
     const fetchMessages = async () => {
       try {
-        const res = await fetch(\`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/messages/${selectedUser._id}`, {
+        const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/messages/${selectedUser._id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (res.ok) {
           const data = await res.json();
           setMessages(data);
           
-          await fetch(\`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/messages/seen/${selectedUser._id}`, {
+          await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/messages/seen/${selectedUser._id}`, {
             method: 'PATCH',
             headers: { Authorization: `Bearer ${token}` }
           });
@@ -104,7 +104,7 @@ export default function ChatSection() {
 
       if (isFromSelected) {
         setMessages(prev => [...prev, msg]);
-        fetch(\`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/messages/seen/${msg.senderId}`, {
+        fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/messages/seen/${msg.senderId}`, {
           method: 'PATCH',
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -161,7 +161,7 @@ export default function ChatSection() {
     setShowEmojiPicker(false);
 
     try {
-      const res = await fetch(\`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/messages/send/${selectedUser._id}`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/messages/send/${selectedUser._id}`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -192,7 +192,7 @@ export default function ChatSection() {
 
   const handleToggleReaction = async (messageId, emoji) => {
     try {
-      const res = await fetch(\`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/messages/react/${messageId}`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/messages/react/${messageId}`, {
         method: 'PATCH',
         headers: { 
           'Content-Type': 'application/json',
@@ -215,7 +215,7 @@ export default function ChatSection() {
     if (!window.confirm('Are you sure you want to clear this chat? This only clears it for you.')) return;
 
     try {
-      const res = await fetch(\`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/messages/clear/${selectedUser._id}`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/messages/clear/${selectedUser._id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -235,7 +235,7 @@ export default function ChatSection() {
     const action = isBlocked ? 'unblock' : 'block';
     
     try {
-      const res = await fetch(\`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/users/${action}/${selectedUser._id}`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/users/${action}/${selectedUser._id}`, {
         method: 'PATCH',
         headers: { Authorization: `Bearer ${token}` }
       });

@@ -48,7 +48,7 @@ export default function ChatbotIcon() {
     setIsTyping(true);
 
     try {
-      const response = await fetch(\`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/chatbot\`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/chatbot`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: [...messages, userMessage] }),
