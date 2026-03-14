@@ -17,7 +17,7 @@ export const SocketProvider = ({ children }) => {
     const user = userRaw ? JSON.parse(userRaw) : null;
 
     if (user && token) {
-      const socketInstance = io('http://localhost:5000', {
+      const socketInstance = io((process.env.REACT_APP_API_URL || 'http://localhost:5000'), {
         auth: { token },
       });
 

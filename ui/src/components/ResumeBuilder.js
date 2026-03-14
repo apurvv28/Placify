@@ -4,7 +4,7 @@ import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import { Plus, Trash2, X, Download, FileText, Sparkles, Upload } from 'lucide-react';
 
-const API_URL = 'http://localhost:5000/api/resume';
+const API_URL = \`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/resume\`;
 
 const TEMPLATES = [
     { id: 'Template1', name: 'Sidebar Left', color: 'from-green-500 to-teal-500', image: '/images/template1.png' },

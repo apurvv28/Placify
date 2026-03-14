@@ -2,7 +2,7 @@ import React, { useState, useRef, useCallback } from 'react';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
-const BACKEND = 'http://localhost:5000';
+const BACKEND = (process.env.REACT_APP_API_URL || 'http://localhost:5000');
 
 function scoreColor(score) {
   if (score >= 75) return { stroke: 'url(#scoreGradGreen)', text: 'text-emerald-400', label: 'Strong Match', bg: 'bg-emerald-500/10 border-emerald-400/30 text-emerald-300' };

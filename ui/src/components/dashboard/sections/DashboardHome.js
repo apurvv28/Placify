@@ -58,7 +58,7 @@ export default function DashboardHome({ userName, token }) {
   const fetchUsers = useCallback(async (query = '') => {
     try {
       const tkn = token || localStorage.getItem('placifyToken');
-      const url = `http://localhost:5000/api/auth/users${query ? `?search=${encodeURIComponent(query)}` : ''}`;
+      const url = \`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/auth/users${query ? `?search=${encodeURIComponent(query)}` : ''}`;
       const res = await fetch(url, { headers: { Authorization: `Bearer ${tkn}` } });
       if (!res.ok) return;
       const data = await res.json();

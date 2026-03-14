@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
-const API = 'http://localhost:5000/api/posts';
+const API = \`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/posts\`;
 const CATEGORIES = ['All Posts', 'Success Story', 'Resume', 'Interview Prep', 'Experiences', 'Internship', 'Study Group', 'General'];
 
 function timeAgo(dateStr) {

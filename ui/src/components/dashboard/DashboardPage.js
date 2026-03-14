@@ -42,7 +42,7 @@ export default function DashboardPage() {
 
     const fetchCurrentUser = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/auth/me', {
+        const response = await fetch(\`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/auth/me\`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -97,7 +97,7 @@ export default function DashboardPage() {
       if (onboardingForm.profileType === 'working_professional') payload.workingRole = onboardingForm.workingRole;
       if (onboardingForm.profileType === 'student') payload.studentStatus = onboardingForm.studentStatus;
 
-      const response = await fetch('http://localhost:5000/api/auth/onboarding', {
+      const response = await fetch(\`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/auth/onboarding\`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify(payload),
