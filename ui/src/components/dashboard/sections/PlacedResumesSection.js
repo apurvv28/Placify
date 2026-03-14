@@ -253,29 +253,42 @@ export default function PlacedResumesSection() {
             <div className="flex flex-col md:flex-row gap-6">
               {/* Left Column - Resume Preview Thumbnail */}
               <div className="w-full md:w-[280px] shrink-0">
-                <div className="relative w-full rounded-lg bg-white/10 border border-white/10 p-5 h-[340px] flex flex-col items-center justify-center overflow-hidden">
-                  <div className="absolute inset-0 flex flex-col p-4 opacity-50 pointer-events-none">
-                    <div className="text-white font-bold text-sm mb-2">{selectedResume.name}</div>
-                    <div className="h-[1px] w-full bg-indigo-500/50 mb-4"></div>
-                    
-                    <div className="space-y-3 w-full">
-                      <div>
-                        <span className="text-gray-500 text-[10px] uppercase font-semibold">Experience</span>
-                        <div className="h-2 w-full bg-white/10 rounded mt-1"></div>
-                        <div className="h-2 w-[85%] bg-white/10 rounded mt-1.5"></div>
-                      </div>
-                      <div>
-                        <span className="text-gray-500 text-[10px] uppercase font-semibold">Skills</span>
-                        <div className="h-2 w-3/4 bg-white/10 rounded mt-1"></div>
-                      </div>
-                      <div>
-                        <span className="text-gray-500 text-[10px] uppercase font-semibold">Education</span>
-                        <div className="h-2 w-[90%] bg-white/10 rounded mt-1"></div>
+                {selectedResume.fileUrl && selectedResume.fileUrl.toLowerCase().endsWith('.pdf') ? (
+                  <iframe 
+                    title="Resume Preview"
+                    src={`http://localhost:5000${selectedResume.fileUrl}#toolbar=0&navpanes=0&scrollbar=0`}
+                    className="w-full h-[340px] rounded-lg border border-white/10 bg-white overflow-hidden pointer-events-none"
+                    style={{ backgroundColor: 'white' }}
+                  />
+                ) : (
+                  <div className="relative w-full rounded-lg bg-white/10 border border-white/10 p-5 h-[340px] flex flex-col items-center justify-center overflow-hidden">
+                    <div className="absolute inset-0 flex flex-col p-4 opacity-50 pointer-events-none">
+                      <div className="text-white font-bold text-sm mb-2">{selectedResume.name}</div>
+                      <div className="h-[1px] w-full bg-indigo-500/50 mb-4"></div>
+                      
+                      <div className="space-y-3 w-full">
+                        <div>
+                          <span className="text-gray-500 text-[10px] uppercase font-semibold">Experience</span>
+                          <div className="h-2 w-full bg-white/10 rounded mt-1"></div>
+                          <div className="h-2 w-[85%] bg-white/10 rounded mt-1.5"></div>
+                        </div>
+                        <div>
+                          <span className="text-gray-500 text-[10px] uppercase font-semibold">Skills</span>
+                          <div className="h-2 w-3/4 bg-white/10 rounded mt-1"></div>
+                        </div>
+                        <div>
+                          <span className="text-gray-500 text-[10px] uppercase font-semibold">Education</span>
+                          <div className="h-2 w-[90%] bg-white/10 rounded mt-1"></div>
+                        </div>
                       </div>
                     </div>
+                    {selectedResume.fileUrl && (selectedResume.fileUrl.toLowerCase().endsWith('.doc') || selectedResume.fileUrl.toLowerCase().endsWith('.docx')) ? (
+                      <span className="absolute z-10 text-white/50 text-xl font-bold select-none uppercase tracking-widest text-center">DOCX File<br/><span className="text-sm font-normal">Download to view</span></span>
+                    ) : (
+                      <span className="absolute z-10 text-white/5 text-4xl font-black select-none uppercase tracking-widest transform -rotate-12">Preview</span>
+                    )}
                   </div>
-                  <span className="absolute z-10 text-white/5 text-4xl font-black select-none uppercase tracking-widest transform -rotate-12">Preview</span>
-                </div>
+                )}
               </div>
 
               {/* Right Column - Details */}              <div className="flex-1 min-w-0 flex flex-col">
