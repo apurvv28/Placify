@@ -4,6 +4,7 @@ const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');
 const postRoutes = require('./routes/postRoutes');
 const atsRoutes = require('./routes/atsRoutes');
+const resumeRoutes = require('./routes/resumeRoutes');
 const { notFound, errorHandler } = require('./middlewares/errorMiddleware');
 const messageRoutes = require('./routes/messageRoutes');
 const chatbotRoutes = require('./routes/chatbotRoutes');
@@ -30,8 +31,8 @@ app.use('/api/posts', postRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/chatbot', chatbotRoutes);
 app.use('/api/users', userRoutes);
-
 app.use('/api/ats', atsRoutes);
+app.use('/api/resume', resumeRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
