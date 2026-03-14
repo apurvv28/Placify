@@ -1,13 +1,5 @@
 import React, { useState, useEffect } from 'react';
 
-const RESUMES = [
-  { id: 1, name: 'Aarav Sharma', role: 'SDE - Product Company', batch: '2026', company: 'Amazon', views: '1.2k', tags: ['React', 'Node.js', 'DSA'] },
-  { id: 2, name: 'Meera Patel', role: 'Data Analyst - FinTech', batch: '2025', company: 'Goldman Sachs', views: '940', tags: ['Python', 'SQL', 'Tableau'] },
-  { id: 3, name: 'Karthik R.', role: 'Full Stack - Startup', batch: '2026', company: 'Razorpay', views: '1.5k', tags: ['Next.js', 'MongoDB', 'TypeScript'] },
-  { id: 4, name: 'Sneha G.', role: 'ML Engineer', batch: '2025', company: 'Microsoft', views: '870', tags: ['PyTorch', 'NLP', 'Docker'] },
-  { id: 5, name: 'Arjun V.', role: 'Backend Engineer', batch: '2026', company: 'Google', views: '2.1k', tags: ['Go', 'gRPC', 'Kubernetes'] },
-  { id: 6, name: 'Divya K.', role: 'Frontend Developer', batch: '2025', company: 'Flipkart', views: '680', tags: ['React', 'CSS', 'TypeScript'] },
-];
 
 const FILTERS = ['All', '2026', '2025'];
 
@@ -140,7 +132,7 @@ export default function PlacedResumesSection() {
   const [filter, setFilter] = useState('All');
   const [selectedResume, setSelectedResume] = useState(null);
   const [showUploadModal, setShowUploadModal] = useState(false);
-  const [resumes, setResumes] = useState(RESUMES);
+  const [resumes, setResumes] = useState([]);
 
   const userStr = localStorage.getItem('placifyUser');
   const user = userStr ? JSON.parse(userStr) : null;
@@ -161,7 +153,7 @@ export default function PlacedResumesSection() {
           summary: r.summary,
           fileUrl: r.fileUrl
         }));
-        setResumes([...mappedResumes, ...RESUMES]);
+        setResumes(mappedResumes);
       }
     } catch (err) {
       console.error(err);
