@@ -3,10 +3,10 @@ import { Upload, X, ArrowRight, CheckCircle, FileText, Loader2 } from 'lucide-re
 
 const floatingUsers = [
   { id: 1, name: 'Nisha', role: 'Software Engineer', score: '96%', position: { top: '15%', right: '28%' }, delay: '0s', duration: '8s', color: 'from-pink-500 to-rose-500' },
-  { id: 2, name: 'Rahul', role: 'Data Scientist', score: '92%', position: { top: '65%', right: '35%' }, delay: '2s', duration: '9s', color: 'from-blue-500 to-cyan-500' },
-  { id: 3, name: 'Sneha', role: 'Product Manager', score: '88%', position: { top: '25%', right: '8%' }, delay: '1s', duration: '7s', color: 'from-green-400 to-emerald-500' },
-  { id: 4, name: 'Amit', role: 'UX Designer', score: '94%', position: { top: '75%', right: '15%' }, delay: '3s', duration: '10s', color: 'from-amber-400 to-orange-500' },
-  { id: 5, name: 'Nikhil', role: 'Backend Engineer', score: '91%', position: { top: '45%', right: '22%' }, delay: '1.5s', duration: '8.5s', color: 'from-purple-500 to-violet-500' },
+  { id: 2, name: 'Soha', role: 'Data Scientist', score: '92%', position: { top: '65%', right: '35%' }, delay: '2s', duration: '9s', color: 'from-blue-500 to-cyan-500' },
+  { id: 3, name: 'Shantanu', role: 'Product Manager', score: '88%', position: { top: '25%', right: '8%' }, delay: '1s', duration: '7s', color: 'from-green-400 to-emerald-500' },
+  { id: 4, name: 'Apurv', role: 'UX Designer', score: '94%', position: { top: '75%', right: '15%' }, delay: '3s', duration: '10s', color: 'from-amber-400 to-orange-500' },
+  // { id: 5, name: 'Nikhil', role: 'Backend Engineer', score: '91%', position: { top: '45%', right: '22%' }, delay: '1.5s', duration: '8.5s', color: 'from-purple-500 to-violet-500' },
 ];
 
 export default function Hero() {
