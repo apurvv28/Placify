@@ -15,7 +15,7 @@ exports.getResume = async (req, res, next) => {
 
 exports.saveResume = async (req, res, next) => {
     try {
-        const { template, professionalSummary, personalInfo, languages, experience, skills, projects, education } = req.body;
+        const { template, professionalSummary, personalInfo, languages, experience, skills, projects, education } = req.body || {};
 
         let resume = await Resume.findOne({ user: req.userId });
 
@@ -66,7 +66,7 @@ const path = require('path');
 
 const createResume = async (req, res) => {
   try {
-    const { name, summary, skills, company, ctc, isInternship, year, stipend } = req.body;
+    const { name, summary, skills, company, ctc, isInternship, year, stipend } = req.body || {};
     
     if (!req.file) {
       return res.status(400).json({ message: 'Please upload a resume file' });
