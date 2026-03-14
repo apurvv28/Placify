@@ -102,7 +102,7 @@ const createResume = async (req, res) => {
 
 const getResumes = async (req, res) => {
   try {
-    const resumes = await Resume.find().populate('user', 'name placementStatus').sort({ createdAt: -1 });
+    const resumes = await Resume.find({ fileUrl: { $exists: true, $ne: null } }).populate('user', 'name placementStatus').sort({ createdAt: -1 });
     res.json({ resumes });
   } catch (error) {
     console.error(error);

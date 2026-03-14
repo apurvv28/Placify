@@ -33,7 +33,7 @@ function UploadResumeModal({ onClose, onSuccess }) {
       });
 
       const token = localStorage.getItem('placifyToken');
-      const response = await fetch('http://localhost:5000/api/resumes', {
+      const response = await fetch('http://localhost:5000/api/resumes/upload', {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`
@@ -139,7 +139,7 @@ export default function PlacedResumesSection() {
 
   const fetchResumes = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/resumes');
+      const res = await fetch('http://localhost:5000/api/resumes/all');
       const data = await res.json();
       if (res.ok) {
         const mappedResumes = data.resumes.map(r => ({
