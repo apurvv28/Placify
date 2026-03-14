@@ -8,7 +8,7 @@ const userSocketMap = {}; // userId -> socketId mapping
 const initSocket = (server) => {
   io = new Server(server, {
     cors: {
-      origin: process.env.CLIENT_ORIGIN || 'http://localhost:3000',
+      origin: process.env.CLIENT_ORIGIN ? process.env.CLIENT_ORIGIN.split(',') : ['http://localhost:3000', 'https://placify-ai.vercel.app'],
       methods: ['GET', 'POST'],
       credentials: true,
     },
