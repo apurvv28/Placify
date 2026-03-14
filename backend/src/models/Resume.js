@@ -6,9 +6,9 @@ const resumeSchema = new mongoose.Schema({
         ref: 'User',
         required: true,
     },
+    // ---- Resume Builder Fields ----
     template: {
         type: String,
-        required: true,
         default: 'Modern'
     },
     professionalSummary: {
@@ -27,15 +27,44 @@ const resumeSchema = new mongoose.Schema({
         type: Array,
         default: []
     },
-    skills: {
-        type: Array,
-        default: []
-    },
     projects: {
         type: Array,
         default: []
     },
     education: {
+        type: Array,
+        default: []
+    },
+    
+    // ---- Placed Uploads Fields ----
+    name: {
+      type: String
+    },
+    summary: {
+      type: String
+    },
+    company: {
+      type: String
+    },
+    ctc: {
+      type: String
+    },
+    isInternship: {
+      type: Boolean,
+      default: false
+    },
+    year: {
+      type: String
+    },
+    stipend: {
+      type: String
+    },
+    fileUrl: {
+      type: String
+    },
+
+    // ---- Shared / Common ----
+    skills: {
         type: Array,
         default: []
     }
