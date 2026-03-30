@@ -13,9 +13,17 @@ const userRoutes = require('./routes/userRoutes');
 
 const app = express();
 
+const corsOrigins = process.env.CLIENT_ORIGIN
+  ? process.env.CLIENT_ORIGIN.split(',').map((origin) => origin.trim()).filter(Boolean)
+  : [
+      'http://localhost:3000',
+      'https://placify-ai.vercel.app',
+      'https://placify-294zb9z4r-apurv-saktepars-projects.vercel.app',
+    ];
+
 app.use(
   cors({
-    origin: process.env.CLIENT_ORIGIN ? process.env.CLIENT_ORIGIN.split(',') : ['http://localhost:3000', 'https://placify-ai.vercel.app'],
+    origin: corsOrigins,
     credentials: true,
   })
 );
