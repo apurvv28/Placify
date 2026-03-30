@@ -33,6 +33,26 @@ export default function DashboardPage() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
+  const [preselectedChatUser, setPreselectedChatUser] = useState(null);
+
+  const mapPoolUserToChatUser = (u) => {
+    let role = 'Unplaced';
+    if (u.profileType === 'working_professional') role = 'Professional';
+    else if (u.studentStatus === 'placed') role = 'Placed';
+
+    return {
+      _id: u.id || u._id,
+      name: u.name,
+      email: u.email,
+      avatar: u.avatar || null,
+      role,
+      isBlocked: false,
+      profileType: u.profileType,
+      studentStatus: u.studentStatus,
+      workingRole: u.workingRole,
+      linkedinUrl: u.linkedinUrl,
+    };
+  };
 
   useEffect(() => {
     if (!token) {
@@ -202,10 +222,20 @@ export default function DashboardPage() {
       case 'community': return <CommunitySection />;
       case 'ats-analyzer': return <ATSAnalyzerSection />;
       case 'resume-builder': return <ResumeBuilderSection />;
-      case 'chat': return <ChatSection />;
+      case 'chat': return <ChatSection preselectedUser={preselectedChatUser} />;
       case 'placed-resumes': return <PlacedResumesSection />;
       case 'profile': return <UserProfileSection user={user} />;
-      default: return <DashboardHome userName={user?.name} token={token} />;
+      default:
+        return (
+          <DashboardHome
+            userName={user?.name}
+            token={token}
+            onOpenChat={(poolUser) => {
+              setPreselectedChatUser(mapPoolUserToChatUser(poolUser));
+              setActiveSection('chat');
+            }}
+          />
+        );
     }
   };
 

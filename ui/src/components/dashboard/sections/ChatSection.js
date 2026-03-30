@@ -18,7 +18,7 @@ const REACTION_EMOJIS = [
 ];
 
 
-export default function ChatSection() {
+export default function ChatSection({ preselectedUser = null }) {
   const { socket, onlineUsers } = useSocket();
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -64,6 +64,13 @@ export default function ChatSection() {
   useEffect(() => {
     fetchUsers();
   }, [token, fetchUsers]);
+
+  useEffect(() => {
+    if (!preselectedUser) return;
+
+    const matched = users.find((u) => u._id === preselectedUser._id);
+    setSelectedUser(matched || preselectedUser);
+  }, [preselectedUser, users]);
 
   // Fetch messages when a user is selected
   useEffect(() => {

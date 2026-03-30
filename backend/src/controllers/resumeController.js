@@ -1,9 +1,14 @@
-const Resume = require('../models/Resume');
+const ResumeRepository = require('../repositories/ResumeRepository');
+const UserRepository = require('../repositories/UserRepository');
+
+const resumeRepo = new ResumeRepository();
+const userRepo = new UserRepository();
 
 
 exports.getResume = async (req, res, next) => {
     try {
-        const resume = await Resume.findOne({ user: req.userId });
+    const { items } = await resumeRepo.findByUserId(req.userId, 100);
+    const resume = items.find((r) => r.hasFile === '0') || items[0];
         if (!resume) {
             return res.status(404).json({ message: 'Resume not found' });
         }
@@ -17,21 +22,24 @@ exports.saveResume = async (req, res, next) => {
     try {
         const { template, professionalSummary, personalInfo, languages, experience, skills, projects, education } = req.body || {};
 
-        let resume = await Resume.findOne({ user: req.userId });
+    const { items } = await resumeRepo.findByUserId(req.userId, 100);
+    let resume = items.find((r) => r.hasFile === '0');
 
         if (resume) {
-            resume.template = template || resume.template;
-            if (professionalSummary !== undefined) resume.professionalSummary = professionalSummary;
-            if (personalInfo !== undefined) resume.personalInfo = personalInfo;
-            if (languages !== undefined) resume.languages = languages;
-            if (experience !== undefined) resume.experience = experience;
-            if (skills !== undefined) resume.skills = skills;
-            if (projects !== undefined) resume.projects = projects;
-            if (education !== undefined) resume.education = education;
-            await resume.save();
+      resume = await resumeRepo.update(resume.resumeId, {
+        template: template || resume.template,
+        professionalSummary: professionalSummary !== undefined ? professionalSummary : resume.professionalSummary,
+        personalInfo: personalInfo !== undefined ? personalInfo : resume.personalInfo,
+        languages: languages !== undefined ? languages : resume.languages,
+        experience: experience !== undefined ? experience : resume.experience,
+        skills: skills !== undefined ? skills : resume.skills,
+        projects: projects !== undefined ? projects : resume.projects,
+        education: education !== undefined ? education : resume.education,
+        hasFile: '0',
+      });
         } else {
-            resume = await Resume.create({
-                user: req.userId,
+      resume = await resumeRepo.create({
+        userId: req.userId,
                 template: template || 'Modern',
                 professionalSummary: professionalSummary || '',
                 personalInfo: personalInfo || {},
@@ -51,10 +59,12 @@ exports.saveResume = async (req, res, next) => {
 
 exports.clearResume = async (req, res, next) => {
     try {
-        const resume = await Resume.findOneAndDelete({ user: req.userId });
-        if (!resume) {
+    const { items } = await resumeRepo.findByUserId(req.userId, 100);
+    if (!items.length) {
             return res.status(404).json({ message: 'Resume not found' });
         }
+
+    await Promise.all(items.map((r) => resumeRepo.delete(r.resumeId)));
         return res.status(200).json({ message: 'Resume cleared successfully' });
     } catch (error) {
         return next(error);
@@ -80,8 +90,8 @@ const createResume = async (req, res) => {
 
     const fileUrl = `/uploads/${req.file.filename}`;
 
-    const resume = await Resume.create({
-      user: req.userId,
+    const resume = await resumeRepo.create({
+      userId: req.userId,
       name,
       summary,
       skills: processedSkills,
@@ -102,7 +112,14 @@ const createResume = async (req, res) => {
 
 const getResumes = async (req, res) => {
   try {
-    const resumes = await Resume.find({ fileUrl: { $exists: true, $ne: null } }).populate('user', 'name placementStatus').sort({ createdAt: -1 });
+    const { items } = await resumeRepo.findByHasFile('1', 200);
+    const resumes = await Promise.all(items.map(async (r) => {
+      const user = r.userId ? await userRepo.findById(r.userId) : null;
+      return {
+        ...r,
+        user: user ? { userId: user.userId, name: user.name } : null,
+      };
+    }));
     res.json({ resumes });
   } catch (error) {
     console.error(error);

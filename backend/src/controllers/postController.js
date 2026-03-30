@@ -1,21 +1,23 @@
-const Post = require('../models/Post');
-const Comment = require('../models/Comment');
+const PostRepository = require('../repositories/PostRepository');
+const CommentRepository = require('../repositories/CommentRepository');
+const UserRepository = require('../repositories/UserRepository');
 
-/* ───── helpers ───── */
-const populateAuthor = { path: 'author', select: 'name email' };
+const postRepo = new PostRepository();
+const commentRepo = new CommentRepository();
+const userRepo = new UserRepository();
 
-const formatPost = (post, userId) => ({
-  id: post._id,
+const formatPost = (post, userId, author) => ({
+  id: post.postId,
   title: post.title,
   content: post.content,
   category: post.category,
   author: {
-    id: post.author._id,
-    name: post.author.name,
-    email: post.author.email,
+    id: author?.userId || post.authorId,
+    name: author?.name || 'Unknown',
+    email: author?.email || 'unknown@unknown.com',
   },
   likesCount: post.likes.length,
-  liked: post.likes.some((uid) => uid.toString() === userId),
+  liked: post.likes.some((uid) => uid === userId),
   commentsCount: post._commentsCount ?? 0,
   createdAt: post.createdAt,
   updatedAt: post.updatedAt,
@@ -27,37 +29,33 @@ const formatPost = (post, userId) => ({
 const getPosts = async (req, res, next) => {
   try {
     const { category, page = 1, limit = 20 } = req.query;
-    const filter = {};
-    if (category && category !== 'All Posts') filter.category = category;
+    const pageNum = Number(page);
+    const limitNum = Number(limit);
 
-    const skip = (Number(page) - 1) * Number(limit);
+    let result;
+    if (category && category !== 'All Posts') {
+      result = await postRepo.findByCategory(category, limitNum);
+    } else {
+      result = await postRepo.findAll(limitNum);
+    }
 
-    const [posts, total] = await Promise.all([
-      Post.find(filter)
-        .populate(populateAuthor)
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(Number(limit)),
-      Post.countDocuments(filter),
-    ]);
+    const posts = result.items;
+    
+    // Fetch authors and comment counts for all posts
+    const postsWithData = await Promise.all(
+      posts.map(async (post) => {
+        const [author, commentsCount] = await Promise.all([
+          userRepo.findById(post.authorId),
+          commentRepo.countByPostId(post.postId),
+        ]);
+        post._commentsCount = commentsCount;
+        return { post, author };
+      })
+    );
 
-    // Gather comment counts for all returned posts in one query
-    const postIds = posts.map((p) => p._id);
-    const commentCounts = await Comment.aggregate([
-      { $match: { post: { $in: postIds } } },
-      { $group: { _id: '$post', count: { $sum: 1 } } },
-    ]);
-    const countMap = {};
-    commentCounts.forEach((c) => {
-      countMap[c._id.toString()] = c.count;
-    });
+    const formatted = postsWithData.map(({ post, author }) => formatPost(post, req.userId, author));
 
-    const formatted = posts.map((p) => {
-      p._commentsCount = countMap[p._id.toString()] || 0;
-      return formatPost(p, req.userId);
-    });
-
-    return res.status(200).json({ posts: formatted, total, page: Number(page), limit: Number(limit) });
+    return res.status(200).json({ posts: formatted, total: posts.length, page: pageNum, limit: limitNum });
   } catch (err) {
     return next(err);
   }
@@ -66,13 +64,14 @@ const getPosts = async (req, res, next) => {
 // GET /api/posts/:id
 const getPostById = async (req, res, next) => {
   try {
-    const post = await Post.findById(req.params.id).populate(populateAuthor);
+    const post = await postRepo.findById(req.params.id);
     if (!post) return res.status(404).json({ message: 'Post not found' });
 
-    const commentsCount = await Comment.countDocuments({ post: post._id });
+    const author = await userRepo.findById(post.authorId);
+    const commentsCount = await commentRepo.countByPostId(post.postId);
     post._commentsCount = commentsCount;
 
-    return res.status(200).json({ post: formatPost(post, req.userId) });
+    return res.status(200).json({ post: formatPost(post, req.userId, author) });
   } catch (err) {
     return next(err);
   }
@@ -87,17 +86,17 @@ const createPost = async (req, res, next) => {
       return res.status(400).json({ message: 'Title and content are required' });
     }
 
-    const post = await Post.create({
-      author: req.userId,
+    const post = await postRepo.create({
+      authorId: req.userId,
       title: title.trim(),
       content: content.trim(),
       category: category || 'General',
     });
 
-    const populated = await post.populate(populateAuthor);
-    populated._commentsCount = 0;
+    const author = await userRepo.findById(post.authorId);
+    post._commentsCount = 0;
 
-    return res.status(201).json({ message: 'Post created', post: formatPost(populated, req.userId) });
+    return res.status(201).json({ message: 'Post created', post: formatPost(post, req.userId, author) });
   } catch (err) {
     return next(err);
   }
@@ -106,14 +105,15 @@ const createPost = async (req, res, next) => {
 // DELETE /api/posts/:id
 const deletePost = async (req, res, next) => {
   try {
-    const post = await Post.findById(req.params.id);
+    const post = await postRepo.findById(req.params.id);
     if (!post) return res.status(404).json({ message: 'Post not found' });
-    if (post.author.toString() !== req.userId) {
+    if (post.authorId !== req.userId) {
       return res.status(403).json({ message: 'You can only delete your own posts' });
     }
 
-    await Comment.deleteMany({ post: post._id });
-    await post.deleteOne();
+    // Note: DynamoDB doesn't support batch delete by GSI
+    // For production, use DynamoDB streams or scheduled cleanup
+    await postRepo.delete(post.postId);
 
     return res.status(200).json({ message: 'Post deleted' });
   } catch (err) {
@@ -126,23 +126,16 @@ const deletePost = async (req, res, next) => {
 // PUT /api/posts/:id/like
 const toggleLike = async (req, res, next) => {
   try {
-    const post = await Post.findById(req.params.id);
+    const post = await postRepo.findById(req.params.id);
     if (!post) return res.status(404).json({ message: 'Post not found' });
 
-    const idx = post.likes.indexOf(req.userId);
-    if (idx === -1) {
-      post.likes.push(req.userId);
-    } else {
-      post.likes.splice(idx, 1);
-    }
+    const updatedPost = await postRepo.toggleLike(post.postId, req.userId);
 
-    await post.save();
-    await post.populate(populateAuthor);
+    const author = await userRepo.findById(updatedPost.authorId);
+    const commentsCount = await commentRepo.countByPostId(updatedPost.postId);
+    updatedPost._commentsCount = commentsCount;
 
-    const commentsCount = await Comment.countDocuments({ post: post._id });
-    post._commentsCount = commentsCount;
-
-    return res.status(200).json({ post: formatPost(post, req.userId) });
+    return res.status(200).json({ post: formatPost(updatedPost, req.userId, author) });
   } catch (err) {
     return next(err);
   }
@@ -153,15 +146,16 @@ const toggleLike = async (req, res, next) => {
 // GET /api/posts/:id/comments
 const getComments = async (req, res, next) => {
   try {
-    const comments = await Comment.find({ post: req.params.id })
-      .populate({ path: 'author', select: 'name email' })
-      .sort({ createdAt: -1 });
+    const { items: comments } = await commentRepo.findByPostId(req.params.id);
 
-    const formatted = comments.map((c) => ({
-      id: c._id,
-      content: c.content,
-      author: { id: c.author._id, name: c.author.name, email: c.author.email },
-      createdAt: c.createdAt,
+    const formatted = await Promise.all(comments.map(async (c) => {
+      const author = await userRepo.findById(c.authorId);
+      return {
+        id: c.commentId,
+        content: c.content,
+        author: { id: c.authorId, name: author?.name || 'Unknown', email: author?.email || 'unknown@unknown.com' },
+        createdAt: c.createdAt,
+      };
     }));
 
     return res.status(200).json({ comments: formatted });
@@ -178,24 +172,24 @@ const addComment = async (req, res, next) => {
       return res.status(400).json({ message: 'Comment content is required' });
     }
 
-    const post = await Post.findById(req.params.id);
+    const post = await postRepo.findById(req.params.id);
     if (!post) return res.status(404).json({ message: 'Post not found' });
 
-    const comment = await Comment.create({
-      post: post._id,
-      author: req.userId,
+    const comment = await commentRepo.create({
+      postId: post.postId,
+      authorId: req.userId,
       content: content.trim(),
     });
 
-    const populated = await comment.populate({ path: 'author', select: 'name email' });
+    const author = await userRepo.findById(comment.authorId);
 
     return res.status(201).json({
       message: 'Comment added',
       comment: {
-        id: populated._id,
-        content: populated.content,
-        author: { id: populated.author._id, name: populated.author.name, email: populated.author.email },
-        createdAt: populated.createdAt,
+        id: comment.commentId,
+        content: comment.content,
+        author: { id: comment.authorId, name: author?.name || 'Unknown', email: author?.email || 'unknown@unknown.com' },
+        createdAt: comment.createdAt,
       },
     });
   } catch (err) {
@@ -206,13 +200,14 @@ const addComment = async (req, res, next) => {
 // DELETE /api/posts/:postId/comments/:commentId
 const deleteComment = async (req, res, next) => {
   try {
-    const comment = await Comment.findById(req.params.commentId);
+    const { items } = await commentRepo.findByPostId(req.params.postId, 500);
+    const comment = items.find((c) => c.commentId === req.params.commentId);
     if (!comment) return res.status(404).json({ message: 'Comment not found' });
-    if (comment.author.toString() !== req.userId) {
+    if (comment.authorId !== req.userId) {
       return res.status(403).json({ message: 'You can only delete your own comments' });
     }
 
-    await comment.deleteOne();
+    await commentRepo.delete(req.params.postId, comment.createdAtCommentId);
     return res.status(200).json({ message: 'Comment deleted' });
   } catch (err) {
     return next(err);

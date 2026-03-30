@@ -18,7 +18,7 @@
   <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" />
   <img src="https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white" />
   <img src="https://img.shields.io/badge/Express.js-404D59?style=for-the-badge" />
-  <img src="https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white" />
+  <img src="https://img.shields.io/badge/AWS_DynamoDB-4053D6?style=for-the-badge&logo=amazondynamodb&logoColor=white" />
   <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" />
   <img src="https://img.shields.io/badge/Socket.io-black?style=for-the-badge&logo=socket.io&badgeColor=010101" />
   <img src="https://img.shields.io/badge/Groq-orange?style=for-the-badge" />
@@ -41,7 +41,7 @@ The architecture follows a robust **Client-Server** model connecting modern AI t
 
 * **Frontend:** Built using `React.js` and `Tailwind CSS` for a highly responsive, glassmorphic UI. `Axios` handles robust API requests while `socket.io-client` effortlessly drives live messaging and notifications.
 * **Backend:** `Node.js` with `Express` exposes a beautifully structured RESTful API. Custom middleware guarantees protected routes with JWT-based Auth. Form data operations and file uploads are seamlessly digested with `multer`, `pdf-parse`, and `mammoth`.
-* **Database:** `MongoDB` managed with `Mongoose` schema models to efficiently map Users, Posts, Resumes, and immersive Chat histories for fast indexing.
+* **Database:** `AWS DynamoDB` with `AWS SDK v3` repositories to persist Users, Posts, Resumes, and chat histories.
 * **AI Engine:** State-of-the-art integrations powered by **Google Gemini AI** and **Groq**. These language models execute high-quality Resume ATS (Applicant Tracking System) scans natively and provide an interactive AI chat experience to help simulate interviews.
 * **Real-time Comms:** The WebSocket protocol via `Socket.io` establishes persistent, bidirectional connections enabling real-time private messages between users and recruiters.
 
@@ -122,7 +122,8 @@ The architecture follows a robust **Client-Server** model connecting modern AI t
 ### Prerequisites
 
 - Node.js (v18+)
-- MongoDB (Local or Atlas URI)
+- AWS account with DynamoDB access
+- AWS CLI configured profile (`default`) for local backend runtime
 - Gemini and Groq API Keys
 
 ### Quick Setup
@@ -138,7 +139,8 @@ The architecture follows a robust **Client-Server** model connecting modern AI t
    ```bash
    cd backend
    npm install
-   # Configure .env: PORT, MONGO_URI, JWT_SECRET, GEMINI_API_KEY, GROQ_API_KEY, CLIENT_ORIGIN
+  # Configure .env: PORT, JWT_SECRET, GEMINI_API_KEY, GROQ_API_KEY, CLIENT_ORIGIN, AWS_REGION, DYNAMODB_*_TABLE
+  # Configure AWS credentials (one time): aws configure --profile default
    npm start # or npm run dev
    ```
 3. **Frontend Configuration:**
@@ -146,9 +148,119 @@ The architecture follows a robust **Client-Server** model connecting modern AI t
    ```bash
    cd ../ui
    npm install
-   # Configure .env: REACT_APP_BACKEND_URL=http://localhost:5000
+  # Configure .env: REACT_APP_API_URL=http://localhost:5000
    npm start
    ```
+
+---
+
+## ☁️ Deployment Guide (Vercel + AWS DynamoDB)
+
+### Architecture
+
+- Frontend: Vercel (React)
+- Backend: Vercel (Express API)
+- Database: AWS DynamoDB (ap-south-1)
+
+### 1. Deploy Frontend to Vercel
+
+1. Push project to GitHub.
+2. In Vercel, import repository and set project root to `ui`.
+3. Build settings:
+  - Build Command: `npm run build`
+  - Output Directory: `build`
+4. Add environment variable in Vercel:
+  - `REACT_APP_API_URL=https://<your-backend-domain>`
+5. Deploy and verify frontend loads.
+
+### 2. Deploy Express Backend to Vercel
+
+1. In Vercel, create a second project for backend with root directory `backend`.
+2. Set Framework Preset to `Other`.
+3. Add environment variables in the Vercel backend project:
+  - `JWT_SECRET=<your-secret>`
+  - `JWT_EXPIRES_IN=7d`
+  - `CLIENT_ORIGIN=https://<your-frontend-vercel-domain>`
+  - `AWS_REGION=ap-south-1`
+  - `DYNAMODB_USERS_TABLE=PlacifyUsers`
+  - `DYNAMODB_POSTS_TABLE=PlacifyPosts`
+  - `DYNAMODB_COMMENTS_TABLE=PlacifyComments`
+  - `DYNAMODB_RESUMES_TABLE=PlacifyResumes`
+  - `DYNAMODB_MESSAGES_TABLE=PlacifyMessages`
+  - `DYNAMODB_CONVERSATIONS_TABLE=PlacifyConversations`
+  - `GEMINI_API_KEY=<your-key>`
+  - `GROQ_API_KEY=<your-key>`
+4. Configure AWS credentials for Vercel runtime (IAM user keys):
+  - `AWS_ACCESS_KEY_ID=<your-access-key-id>`
+  - `AWS_SECRET_ACCESS_KEY=<your-secret-access-key>`
+5. Deploy backend and verify health endpoint:
+  - `GET https://<your-backend-vercel-domain>/api/health`
+
+### 3. Connect Frontend to Vercel Backend
+
+In frontend Vercel project env vars, set:
+
+- `REACT_APP_API_URL=https://<your-backend-vercel-domain>`
+
+Redeploy frontend after changing env vars.
+
+### 4. Optional: Deploy Express Backend on AWS (Elastic Beanstalk)
+
+1. Package backend app:
+  - Use folder `backend` as application source.
+2. Create Elastic Beanstalk Node.js environment (Region: `ap-south-1`).
+3. Set environment variables in Elastic Beanstalk:
+  - `PORT=5000`
+  - `JWT_SECRET=<your-secret>`
+  - `JWT_EXPIRES_IN=7d`
+  - `CLIENT_ORIGIN=https://<your-vercel-domain>`
+  - `AWS_REGION=ap-south-1`
+  - `DYNAMODB_USERS_TABLE=PlacifyUsers`
+  - `DYNAMODB_POSTS_TABLE=PlacifyPosts`
+  - `DYNAMODB_COMMENTS_TABLE=PlacifyComments`
+  - `DYNAMODB_RESUMES_TABLE=PlacifyResumes`
+  - `DYNAMODB_MESSAGES_TABLE=PlacifyMessages`
+  - `DYNAMODB_CONVERSATIONS_TABLE=PlacifyConversations`
+  - `GEMINI_API_KEY=<your-key>`
+  - `GROQ_API_KEY=<your-key>`
+4. Attach IAM role permissions for DynamoDB (least-privilege preferred).
+5. Deploy and verify backend health endpoint:
+  - `GET /api/health`
+
+### 5. Alternative AWS Backend (EC2)
+
+1. Launch EC2 instance and install Node.js + PM2.
+2. Clone repo and run in `backend`:
+  - `npm install`
+  - `pm2 start index.js --name placify-backend`
+3. Configure same `.env` variables as above.
+4. Assign IAM role with DynamoDB access or configure AWS credentials.
+5. Put Nginx in front for HTTPS + reverse proxy to port 5000.
+
+### 6. DynamoDB Requirements
+
+Required tables in `ap-south-1`:
+
+- `PlacifyUsers`
+- `PlacifyPosts`
+- `PlacifyComments`
+- `PlacifyResumes`
+- `PlacifyMessages`
+
+If any table is missing, related features (user pool, resumes, chat) may fail.
+
+### 7. Post-Deployment Checklist
+
+1. Frontend can login/register against backend URL.
+2. `/api/auth/me` returns authenticated user.
+3. User Pool loads users on dashboard.
+4. Chat opens and sends messages.
+5. Resume upload and ATS analysis work.
+6. CORS allows your Vercel domain in backend `CLIENT_ORIGIN`.
+
+### 8. Vercel Realtime Note (Socket.IO)
+
+Vercel serverless functions are not ideal for long-lived WebSocket connections. If real-time chat is unstable in production, deploy Socket.IO backend on a persistent runtime (EC2, ECS, Elastic Beanstalk, or Render) and keep frontend on Vercel.
 
 ---
 

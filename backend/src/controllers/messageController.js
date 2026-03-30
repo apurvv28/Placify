@@ -1,20 +1,33 @@
-const Message = require('../models/Message');
-const User = require('../models/User');
+const MessageRepository = require('../repositories/MessageRepository');
+const UserRepository = require('../repositories/UserRepository');
 const { getReceiverSocketId, getIO } = require('../socket');
 
-// Fetch full conversation between logged-in user and the selected user
+const messageRepo = new MessageRepository();
+const userRepo = new UserRepository();
+const buildClientMessage = (m) => ({
+  _id: `${m.conversationId}__${m.createdAtMessageId}`,
+  conversationId: m.conversationId,
+  createdAtMessageId: m.createdAtMessageId,
+  senderId: m.senderId,
+  receiverId: m.receiverId,
+  text: m.text,
+  seen: m.seen,
+  reactions: m.reactions || [],
+  deletedBy: m.deletedBy || [],
+  createdAt: m.createdAt,
+  updatedAt: m.updatedAt,
+});
+
 exports.getMessages = async (req, res) => {
   try {
     const userId = req.userId;
     const { userId: otherUserId } = req.params;
 
-    const messages = await Message.find({
-      $or: [
-        { senderId: userId, receiverId: otherUserId },
-        { senderId: otherUserId, receiverId: userId },
-      ],
-      deletedBy: { $ne: userId } // Exclude messages that this user cleared
-    }).sort({ createdAt: 1 });
+    const { items } = await messageRepo.findByConversation(userId, otherUserId, 500);
+    const messages = items
+      .filter((m) => !(m.deletedBy || []).includes(userId))
+      .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+      .map(buildClientMessage);
 
     res.status(200).json(messages);
   } catch (error) {
@@ -34,50 +47,44 @@ exports.sendMessage = async (req, res) => {
       return res.status(400).json({ message: 'Message text is required' });
     }
 
-    // Check if receiver has blocked sender
-    const receiver = await User.findById(receiverId);
+    const receiver = await userRepo.findById(receiverId);
     if (receiver && receiver.blockedUsers.includes(senderId)) {
       return res.status(403).json({ message: 'You have been blocked by this user' });
     }
 
-    // Check if sender has blocked receiver
-    const sender = await User.findById(senderId);
+    const sender = await userRepo.findById(senderId);
     if (sender && sender.blockedUsers.includes(receiverId)) {
       return res.status(403).json({ message: 'You have blocked this user. Unblock them to send messages' });
     }
 
-    const newMessage = new Message({
+    const newMessage = await messageRepo.create({
       senderId,
       receiverId,
       text,
     });
 
-    await newMessage.save();
-
     // Emit via Socket.IO to receiver
     const receiverSocketId = getReceiverSocketId(receiverId);
     if (receiverSocketId) {
       const io = getIO();
-      io.to(receiverSocketId).emit('newMessage', newMessage);
+      io.to(receiverSocketId).emit('newMessage', buildClientMessage(newMessage));
     }
 
-    res.status(201).json(newMessage);
+    res.status(201).json(buildClientMessage(newMessage));
   } catch (error) {
     console.error('Error sending message:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };
 
-// Mark all messages from that sender as seen
 exports.markAsSeen = async (req, res) => {
   try {
     const receiverId = req.userId;
     const { senderId } = req.params;
 
-    await Message.updateMany(
-      { senderId, receiverId, seen: false },
-      { $set: { seen: true } }
-    );
+    const { items } = await messageRepo.findByConversation(receiverId, senderId, 500);
+    const pending = items.filter((m) => m.senderId === senderId && m.receiverId === receiverId && !m.seen);
+    await Promise.all(pending.map((m) => messageRepo.markAsRead(m.conversationId, m.createdAtMessageId)));
 
     const senderSocketId = getReceiverSocketId(senderId);
     if (senderSocketId) {
@@ -91,63 +98,54 @@ exports.markAsSeen = async (req, res) => {
   }
 };
 
-// Toggle a reaction on a message
 exports.toggleReaction = async (req, res) => {
   try {
     const userId = req.userId;
-    const { messageId } = req.params;
+    const { messageId: opaqueId } = req.params;
     const { emoji } = req.body;
 
-    const message = await Message.findById(messageId);
+    if (!emoji) {
+      return res.status(400).json({ message: 'Emoji is required' });
+    }
+
+    const [conversationId, createdAtMessageId] = opaqueId.split('__');
+    if (!conversationId || !createdAtMessageId) {
+      return res.status(400).json({ message: 'Invalid message id' });
+    }
+
+    const message = await messageRepo.findById(conversationId, createdAtMessageId);
     if (!message) return res.status(404).json({ message: 'Message not found' });
 
-    // Check if user already reacted with this emoji
-    const existingIndex = message.reactions.findIndex(r => r.userId.toString() === userId.toString() && r.emoji === emoji);
+    const existing = (message.reactions || []).find((r) => r.userId === userId && r.emoji === emoji);
 
-    if (existingIndex > -1) {
-      // Remove reaction
-      message.reactions.splice(existingIndex, 1);
+    if (existing) {
+      await messageRepo.removeReaction(conversationId, createdAtMessageId, userId);
     } else {
-      // Add or update reaction (WhatsApp allows one emoji per user usually, or multiple?)
-      // We'll allow one emoji per user for now.
-      const userReactIndex = message.reactions.findIndex(r => r.userId.toString() === userId.toString());
-      if (userReactIndex > -1) {
-        message.reactions[userReactIndex].emoji = emoji;
-      } else {
-        message.reactions.push({ userId, emoji });
-      }
+      await messageRepo.addReaction(conversationId, createdAtMessageId, userId, emoji);
     }
 
-    await message.save();
+    const updated = await messageRepo.findById(conversationId, createdAtMessageId);
 
     // Notify other user via socket
-    const otherUserId = message.senderId.toString() === userId.toString() ? message.receiverId : message.senderId;
+    const otherUserId = message.senderId === userId ? message.receiverId : message.senderId;
     const otherSocketId = getReceiverSocketId(otherUserId);
     if (otherSocketId) {
-      getIO().to(otherSocketId).emit('messageReaction', { messageId, reactions: message.reactions });
+      getIO().to(otherSocketId).emit('messageReaction', { messageId: opaqueId, reactions: updated.reactions || [] });
     }
 
-    res.status(200).json(message.reactions);
+    res.status(200).json(updated.reactions || []);
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
 };
 
-// Clear all messages in a conversation for the current user
 exports.clearChat = async (req, res) => {
   try {
     const userId = req.userId;
     const { otherUserId } = req.params;
 
-    await Message.updateMany(
-      {
-        $or: [
-          { senderId: userId, receiverId: otherUserId },
-          { senderId: otherUserId, receiverId: userId }
-        ]
-      },
-      { $addToSet: { deletedBy: userId } }
-    );
+    const { items } = await messageRepo.findByConversation(userId, otherUserId, 500);
+    await Promise.all(items.map((m) => messageRepo.markDeletedBy(m.conversationId, m.createdAtMessageId, userId)));
 
     res.status(200).json({ message: 'Chat cleared for you' });
   } catch (error) {

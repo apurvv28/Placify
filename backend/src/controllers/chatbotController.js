@@ -41,8 +41,7 @@ const generateChatResponse = async (req, res) => {
       }
     }
 
-    // Direct REST API call using the v1beta endpoint (most stable for 1.5 models)
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`;
     const response = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

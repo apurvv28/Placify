@@ -1,6 +1,8 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const UserRepository = require('../repositories/UserRepository');
+
+const userRepo = new UserRepository();
 
 const generateToken = (userId) => {
   const secret = process.env.JWT_SECRET || 'change_me';
@@ -10,7 +12,7 @@ const generateToken = (userId) => {
 };
 
 const sanitizeUser = (user) => ({
-  id: user._id,
+  id: user.userId,
   name: user.name,
   email: user.email,
   createdAt: user.createdAt,
@@ -58,20 +60,20 @@ const register = async (req, res, next) => {
       return res.status(400).json({ message: 'Name, email, and password are required' });
     }
 
-    const existingUser = await User.findOne({ email: email.toLowerCase().trim() });
+    const existingUser = await userRepo.findByEmail(email.toLowerCase().trim());
     if (existingUser) {
       return res.status(409).json({ message: 'User already exists with this email' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await User.create({
+    const user = await userRepo.create({
       name: name.trim(),
       email: email.toLowerCase().trim(),
       password: hashedPassword,
     });
 
-    const token = generateToken(user._id);
+    const token = generateToken(user.userId);
 
     return res.status(201).json({
       message: 'User registered successfully',
@@ -91,7 +93,7 @@ const login = async (req, res, next) => {
       return res.status(400).json({ message: 'Email and password are required' });
     }
 
-    const user = await User.findOne({ email: email.toLowerCase().trim() });
+    const user = await userRepo.findByEmail(email.toLowerCase().trim());
     if (!user) {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
@@ -101,7 +103,7 @@ const login = async (req, res, next) => {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
 
-    const token = generateToken(user._id);
+    const token = generateToken(user.userId);
 
     return res.status(200).json({
       message: 'Login successful',
@@ -115,7 +117,7 @@ const login = async (req, res, next) => {
 
 const getCurrentUser = async (req, res, next) => {
   try {
-    const user = await User.findById(req.userId).select('-password');
+    const user = await userRepo.findById(req.userId);
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
@@ -136,18 +138,18 @@ const saveOnboarding = async (req, res, next) => {
       return res.status(400).json({ message: validationMessage });
     }
 
-    const user = await User.findById(req.userId);
+    const existing = await userRepo.findById(req.userId);
 
-    if (!user) {
+    if (!existing) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    user.profileType = profileType;
-    user.workingRole = profileType === 'working_professional' ? workingRole : null;
-    user.studentStatus = profileType === 'student' ? studentStatus : null;
-    user.onboardingCompleted = true;
-
-    await user.save();
+    const user = await userRepo.update(req.userId, {
+      profileType,
+      workingRole: profileType === 'working_professional' ? workingRole : null,
+      studentStatus: profileType === 'student' ? studentStatus : null,
+      onboardingCompleted: true,
+    });
 
     return res.status(200).json({
       message: 'Onboarding details saved successfully',
@@ -161,17 +163,19 @@ const saveOnboarding = async (req, res, next) => {
 const getAllUsers = async (req, res, next) => {
   try {
     const { search } = req.query;
-    const filter = { onboardingCompleted: true, _id: { $ne: req.userId } };
+    const allUsers = await userRepo.findAll();
+
+    let users = allUsers.filter((u) => u.userId !== req.userId && u.onboardingCompleted);
 
     if (search && search.trim()) {
-      const regex = new RegExp(search.trim(), 'i');
-      filter.$or = [{ name: regex }, { email: regex }];
+      const q = search.trim().toLowerCase();
+      users = users.filter((u) =>
+        (u.name || '').toLowerCase().includes(q) ||
+        (u.email || '').toLowerCase().includes(q)
+      );
     }
 
-    const users = await User.find(filter)
-      .select('-password')
-      .sort({ name: 1 })
-      .limit(100);
+    users.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
 
     return res.status(200).json({
       users: users.map(sanitizeUser),
@@ -184,13 +188,14 @@ const getAllUsers = async (req, res, next) => {
 const updateProfile = async (req, res, next) => {
   try {
     const { linkedinUrl } = req.body;
-    const user = await User.findById(req.userId);
+    const user = await userRepo.findById(req.userId);
     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    if (linkedinUrl !== undefined) user.linkedinUrl = linkedinUrl || null;
+    const updatedUser = await userRepo.update(req.userId, {
+      linkedinUrl: linkedinUrl || null,
+    });
 
-    await user.save();
-    return res.status(200).json({ message: 'Profile updated', user: sanitizeUser(user) });
+    return res.status(200).json({ message: 'Profile updated', user: sanitizeUser(updatedUser) });
   } catch (error) {
     return next(error);
   }

@@ -1,6 +1,8 @@
 const { Server } = require('socket.io');
-const User = require('./models/User');
+const UserRepository = require('./repositories/UserRepository');
 const jwt = require('jsonwebtoken');
+
+const userRepo = new UserRepository();
 
 let io;
 const userSocketMap = {}; // userId -> socketId mapping
@@ -36,7 +38,7 @@ const initSocket = (server) => {
 
     // Update user status in DB
     try {
-      await User.findByIdAndUpdate(userId, { isOnline: true });
+      await userRepo.update(userId, { isOnline: true });
     } catch (e) {
       console.error('Error updating user online status:', e);
     }
@@ -49,9 +51,9 @@ const initSocket = (server) => {
       delete userSocketMap[userId];
       
       try {
-        await User.findByIdAndUpdate(userId, { 
+        await userRepo.update(userId, { 
           isOnline: false, 
-          lastSeen: new Date() 
+          lastSeen: new Date().toISOString(), 
         });
       } catch (e) {
         console.error('Error updating user offline status:', e);

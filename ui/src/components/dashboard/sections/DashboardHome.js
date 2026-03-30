@@ -46,7 +46,7 @@ const floatPos = (idx, total) => {
   };
 };
 
-export default function DashboardHome({ userName, token }) {
+export default function DashboardHome({ userName, token, onOpenChat }) {
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
@@ -218,9 +218,13 @@ export default function DashboardHome({ userName, token }) {
               <div className="flex items-center gap-2 pt-2 border-t border-white/10">
                 {/* Chat (placeholder) */}
                 <button
-                  title="Chat (coming soon)"
+                  title={`Chat with ${hoveredUser.name}`}
                   className="p-2 rounded-lg bg-white/5 hover:bg-indigo-500/20 text-gray-400 hover:text-indigo-300 transition-colors"
-                  onClick={(e) => { e.stopPropagation(); }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (onOpenChat) onOpenChat(hoveredUser);
+                    setHoveredUser(null);
+                  }}
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 20.105V4.5A2.25 2.25 0 0 1 6 2.25h12A2.25 2.25 0 0 1 20.25 4.5v11.25a2.25 2.25 0 0 1-2.25 2.25H6.401l-2.651 2.605Z" />
