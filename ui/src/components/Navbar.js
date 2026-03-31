@@ -69,7 +69,7 @@ export default function Navbar() {
 
       {/* Mobile menu */}
       {isOpen && (
-        <div className="md:hidden bg-[#0A0A0A]/98 backdrop-blur-xl border-b border-[#2A2520] absolute w-full">
+        <div className="md:hidden bg-[#0A0A0A]/70 backdrop-blur-3xl border-b border-[#2A2520] absolute w-full shadow-2xl">
           <div className="px-4 pt-2 pb-6 space-y-1">
             {['Features', 'Testimonials', 'Contact'].map((item) => (
               <Link
