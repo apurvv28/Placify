@@ -10,6 +10,7 @@ const { notFound, errorHandler } = require('./middlewares/errorMiddleware');
 const messageRoutes = require('./routes/messageRoutes');
 const chatbotRoutes = require('./routes/chatbotRoutes');
 const userRoutes = require('./routes/userRoutes');
+const { isS3ResumeStorageEnabled, getResumeObject } = require('./config/s3');
 
 const app = express();
 
@@ -30,6 +31,31 @@ app.use(
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.get('/uploads/:filename', async (req, res, next) => {
+  if (!isS3ResumeStorageEnabled()) return next();
+
+  try {
+    const file = await getResumeObject(req.params.filename);
+    if (file.contentType) res.setHeader('Content-Type', file.contentType);
+    if (typeof file.contentLength === 'number') {
+      res.setHeader('Content-Length', String(file.contentLength));
+    }
+    res.setHeader('Cache-Control', 'public, max-age=31536000');
+
+    file.body.on('error', next);
+    file.body.pipe(res);
+  } catch (error) {
+    if (error?.name === 'NoSuchKey' || error?.$metadata?.httpStatusCode === 404) {
+      return next();
+    }
+    return next(error);
+  }
+});
+
+if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
+  app.use('/uploads', express.static('/tmp/uploads'));
+}
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 app.get('/api/health', (req, res) => {

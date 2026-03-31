@@ -1,5 +1,7 @@
 const ResumeRepository = require('../repositories/ResumeRepository');
 const UserRepository = require('../repositories/UserRepository');
+const path = require('path');
+const { isS3ResumeStorageEnabled, uploadResumeBuffer } = require('../config/s3');
 
 const resumeRepo = new ResumeRepository();
 const userRepo = new UserRepository();
@@ -71,9 +73,6 @@ exports.clearResume = async (req, res, next) => {
     }
 };
 
-const fs = require('fs');
-const path = require('path');
-
 const createResume = async (req, res) => {
   try {
     const { name, summary, skills, company, ctc, isInternship, year, stipend } = req.body || {};
@@ -82,13 +81,27 @@ const createResume = async (req, res) => {
       return res.status(400).json({ message: 'Please upload a resume file' });
     }
 
+    if (!isS3ResumeStorageEnabled()) {
+      return res.status(500).json({ message: 'S3 resume storage is not configured. Set S3_RESUME_BUCKET.' });
+    }
+
     // Process skills if it comes as a string (comma separated)
     let processedSkills = skills;
     if (typeof skills === 'string') {
       processedSkills = skills.split(',').map(skill => skill.trim());
     }
 
-    const fileUrl = `/uploads/${req.file.filename}`;
+    const ext = path.extname(req.file.originalname || '').toLowerCase();
+    const safeExt = ext || '.bin';
+    const filename = `resume-${Date.now()}-${Math.random().toString(36).slice(2, 10)}${safeExt}`;
+
+    await uploadResumeBuffer({
+      filename,
+      buffer: req.file.buffer,
+      contentType: req.file.mimetype,
+    });
+
+    const fileUrl = `/uploads/${filename}`;
 
     const resume = await resumeRepo.create({
       userId: req.userId,

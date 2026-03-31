@@ -4,9 +4,21 @@ const UserRepository = require('../repositories/UserRepository');
 
 const userRepo = new UserRepository();
 
+const normalizeExpiresIn = (value) => {
+  if (typeof value !== 'string') return '7d';
+
+  let normalized = value.trim();
+  if (!normalized) return '7d';
+
+  // Accept values accidentally saved as quoted strings in env providers.
+  normalized = normalized.replace(/^['\"]|['\"]$/g, '');
+
+  return normalized || '7d';
+};
+
 const generateToken = (userId) => {
   const secret = process.env.JWT_SECRET || 'change_me';
-  const expiresIn = process.env.JWT_EXPIRES_IN || '7d';
+  const expiresIn = normalizeExpiresIn(process.env.JWT_EXPIRES_IN || '7d');
 
   return jwt.sign({ userId }, secret, { expiresIn });
 };

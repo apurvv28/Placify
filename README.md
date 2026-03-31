@@ -272,9 +272,9 @@ A special thanks to the massive minds driving Placify forward!
   <img src="https://contrib.rocks/image?repo=Apurvv28/Placify" />
 </a>
 
-* **Apurv Saktepar** - Full Stack & AI Backend Integration
+* **Apurv Saktepar** - Full Stack & AI Backend Integration with AWS Services
 * **Soha** - Placed Resume Section and Login Authentication
-* **Nisha** - Chat Communication adn Landing Page
+* **Nisha** - Chat Communication and Landing Page
 * **Shantanu -** Resume Builder and Initial User with DB Connection
 
 

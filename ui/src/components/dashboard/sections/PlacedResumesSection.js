@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 
 const FILTERS = ['All', '2026', '2025'];
+const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 function UploadResumeModal({ onClose, onSuccess }) {
   const [formData, setFormData] = useState({
@@ -33,7 +34,7 @@ function UploadResumeModal({ onClose, onSuccess }) {
       });
 
       const token = localStorage.getItem('placifyToken');
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/resumes/upload`, {
+      const response = await fetch(`${API_BASE}/api/resumes/upload`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`
@@ -139,7 +140,7 @@ export default function PlacedResumesSection() {
 
   const fetchResumes = async () => {
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/resumes/all`);
+      const res = await fetch(`${API_BASE}/api/resumes/all`);
       const data = await res.json();
       if (res.ok) {
         const mappedResumes = data.resumes.map(r => ({
@@ -256,7 +257,7 @@ export default function PlacedResumesSection() {
                 {selectedResume.fileUrl && selectedResume.fileUrl.toLowerCase().endsWith('.pdf') ? (
                   <iframe 
                     title="Resume Preview"
-                    src={`http://localhost:5000${selectedResume.fileUrl}#toolbar=0&navpanes=0&scrollbar=0`}
+                    src={`${API_BASE}${selectedResume.fileUrl}#toolbar=0&navpanes=0&scrollbar=0`}
                     className="w-full h-[340px] rounded-lg border border-white/10 bg-white overflow-hidden pointer-events-none"
                     style={{ backgroundColor: 'white' }}
                   />
@@ -324,7 +325,7 @@ export default function PlacedResumesSection() {
                 <button
                   type="button"
                   onClick={() => {
-                    if (selectedResume.fileUrl) window.open(`http://localhost:5000${selectedResume.fileUrl}`, '_blank');
+                    if (selectedResume.fileUrl) window.open(`${API_BASE}${selectedResume.fileUrl}`, '_blank');
                   }}
                   className="w-full py-2.5 rounded-lg font-medium transition-colors bg-white/10 hover:bg-white/20 text-white flex items-center justify-center gap-2"
                 >
