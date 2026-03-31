@@ -1,5 +1,8 @@
 const express = require('express');
-const { getResume, saveResume, clearResume, createResume, getResumes } = require('../controllers/resumeController');
+const { 
+  getResume, saveResume, clearResume, createResume, getResumes, 
+  viewResume, likeResume, addComment, deleteComment 
+} = require('../controllers/resumeController');
 const protect = require('../middlewares/authMiddleware');
 const multer = require('multer');
 
@@ -30,5 +33,11 @@ router.delete('/', protect, clearResume);
 // Placed Student Resume Upload Routes
 router.get('/all', getResumes);
 router.post('/upload', protect, upload.single('file'), createResume);
+
+// Engagement Routes
+router.post('/:resumeId/view', viewResume);
+router.post('/:resumeId/like', protect, likeResume);
+router.post('/:resumeId/comments', protect, addComment);
+router.delete('/:resumeId/comments/:commentId', protect, deleteComment);
 
 module.exports = router;

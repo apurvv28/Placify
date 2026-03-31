@@ -102,6 +102,11 @@ class ResumeRepository {
         hasFile: resumeData.fileUrl ? '1' : '0',
         createdAt: resumeData.createdAt || now,
         updatedAt: resumeData.updatedAt || now,
+        views: resumeData.views || 0,
+        likes: resumeData.likes || [],
+        likeCount: resumeData.likeCount || 0,
+        comments: resumeData.comments || [],
+        commentCount: resumeData.commentCount || 0,
       };
 
       await docClient.send(new PutCommand({
@@ -168,6 +173,106 @@ class ResumeRepository {
         Key: { resumeId },
       }));
       return true;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async incrementViews(resumeId) {
+    try {
+      const result = await docClient.send(new UpdateCommand({
+        TableName: TABLES.RESUMES,
+        Key: { resumeId },
+        UpdateExpression: 'SET views = if_not_exists(views, :zero) + :inc, updatedAt = :now',
+        ExpressionAttributeValues: {
+          ':zero': 0,
+          ':inc': 1,
+          ':now': new Date().toISOString(),
+        },
+        ReturnValues: 'ALL_NEW',
+      }));
+      return result.Attributes;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async toggleLike(resumeId, userId) {
+    try {
+      const resume = await this.findById(resumeId);
+      if (!resume) throw new Error('Resume not found');
+      const likes = resume.likes || [];
+      const likeIndex = likes.indexOf(userId);
+      const isLiking = likeIndex === -1;
+      if (isLiking) {
+        likes.push(userId);
+      } else {
+        likes.splice(likeIndex, 1);
+      }
+      const result = await docClient.send(new UpdateCommand({
+        TableName: TABLES.RESUMES,
+        Key: { resumeId },
+        UpdateExpression: 'SET likes = :likes, likeCount = :count, updatedAt = :now',
+        ExpressionAttributeValues: {
+          ':likes': likes,
+          ':count': likes.length,
+          ':now': new Date().toISOString(),
+        },
+        ReturnValues: 'ALL_NEW',
+      }));
+      return { ...result.Attributes, isLiking };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async addComment(resumeId, userId, text) {
+    try {
+      const resume = await this.findById(resumeId);
+      if (!resume) throw new Error('Resume not found');
+      const commentId = `${userId}-${Date.now()}`;
+      const comment = {
+        id: commentId,
+        userId,
+        text,
+        createdAt: new Date().toISOString(),
+      };
+      const comments = resume.comments || [];
+      comments.push(comment);
+      const result = await docClient.send(new UpdateCommand({
+        TableName: TABLES.RESUMES,
+        Key: { resumeId },
+        UpdateExpression: 'SET comments = :comments, commentCount = :count, updatedAt = :now',
+        ExpressionAttributeValues: {
+          ':comments': comments,
+          ':count': comments.length,
+          ':now': new Date().toISOString(),
+        },
+        ReturnValues: 'ALL_NEW',
+      }));
+      return result.Attributes;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async deleteComment(resumeId, commentId) {
+    try {
+      const resume = await this.findById(resumeId);
+      if (!resume) throw new Error('Resume not found');
+      const comments = (resume.comments || []).filter(c => c.id !== commentId);
+      const result = await docClient.send(new UpdateCommand({
+        TableName: TABLES.RESUMES,
+        Key: { resumeId },
+        UpdateExpression: 'SET comments = :comments, commentCount = :count, updatedAt = :now',
+        ExpressionAttributeValues: {
+          ':comments': comments,
+          ':count': comments.length,
+          ':now': new Date().toISOString(),
+        },
+        ReturnValues: 'ALL_NEW',
+      }));
+      return result.Attributes;
     } catch (error) {
       throw error;
     }

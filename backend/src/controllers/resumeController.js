@@ -140,10 +140,74 @@ const getResumes = async (req, res) => {
   }
 };
 
+const viewResume = async (req, res) => {
+  try {
+    const { resumeId } = req.params;
+    const resume = await resumeRepo.incrementViews(resumeId);
+    res.json({ message: 'View recorded', resume });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
+const likeResume = async (req, res) => {
+  try {
+    const { resumeId } = req.params;
+    const result = await resumeRepo.toggleLike(resumeId, req.userId);
+    res.json({
+      message: result.isLiking ? 'Resume liked' : 'Resume unliked',
+      resume: result,
+    });
+  } catch (error) {
+    console.error(error);
+    if (error.message === 'Resume not found') {
+      return res.status(404).json({ message: 'Resume not found' });
+    }
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
+const addComment = async (req, res) => {
+  try {
+    const { resumeId } = req.params;
+    const { text } = req.body;
+    if (!text || !text.trim()) {
+      return res.status(400).json({ message: 'Comment text is required' });
+    }
+    const resume = await resumeRepo.addComment(resumeId, req.userId, text.trim());
+    res.status(201).json({ message: 'Comment added', resume });
+  } catch (error) {
+    console.error(error);
+    if (error.message === 'Resume not found') {
+      return res.status(404).json({ message: 'Resume not found' });
+    }
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
+const deleteComment = async (req, res) => {
+  try {
+    const { resumeId, commentId } = req.params;
+    const resume = await resumeRepo.deleteComment(resumeId, commentId);
+    res.json({ message: 'Comment deleted', resume });
+  } catch (error) {
+    console.error(error);
+    if (error.message === 'Resume not found') {
+      return res.status(404).json({ message: 'Resume not found' });
+    }
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
 module.exports = {
   getResume: exports.getResume,
   saveResume: exports.saveResume,
   clearResume: exports.clearResume,
   createResume,
-  getResumes
+  getResumes,
+  viewResume,
+  likeResume,
+  addComment,
+  deleteComment,
 };
