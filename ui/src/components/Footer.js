@@ -30,7 +30,7 @@ export default function Footer() {
 
           <div className="flex gap-3">
              {[<Twitter size={18} />, <Github size={18} />, <Linkedin size={18} />, <Mail size={18} />].map((icon, i) => (
-                <a key={i} href="#" className="w-10 h-10 rounded-lg flex items-center justify-center transition-all border"
+                <a key={i} href="#!" className="w-10 h-10 rounded-lg flex items-center justify-center transition-all border"
                   style={{ backgroundColor: '#111111', borderColor: '#2A2520', color: '#A89E94' }}
                   onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#1C1C1C'; e.currentTarget.style.color = '#FF6B35'; e.currentTarget.style.borderColor = 'rgba(255,107,53,0.3)'; }}
                   onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#111111'; e.currentTarget.style.color = '#A89E94'; e.currentTarget.style.borderColor = '#2A2520'; }}
