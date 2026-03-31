@@ -131,8 +131,12 @@ const analyzeResume = async (req, res) => {
       ? `${baseContext}\n${verificationSummary}`
       : baseContext;
 
-    const groq = getGroqClient();
-    const completion = await groq.chat.completions.create({
+    const apiKey = process.env.GROQ_API_KEY;
+    if (!apiKey || apiKey === 'your_groq_api_key_here') {
+      return res.status(500).json({ success: false, error: 'Analysis failed: GROQ_API_KEY is not configured on the server.' });
+    }
+
+    const payload = {
       model: 'llama-3.3-70b-versatile',
       messages: [
         { role: 'system', content: ATS_SYSTEM_PROMPT },
@@ -140,9 +144,26 @@ const analyzeResume = async (req, res) => {
       ],
       temperature: 0.2,
       max_tokens: 3000,
+    };
+
+    let rawContent = '';
+    const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
     });
 
-    const rawContent = completion.choices[0]?.message?.content || '';
+    if (!groqResponse.ok) {
+        const errText = await groqResponse.text();
+        console.error('Groq HTTP Error:', groqResponse.status, errText);
+        throw new Error(`Groq API returned ${groqResponse.status}: ${errText}`);
+    }
+
+    const groqData = await groqResponse.json();
+    rawContent = groqData.choices[0]?.message?.content || '';
 
     const jsonMatch = rawContent.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
@@ -159,13 +180,14 @@ const analyzeResume = async (req, res) => {
     return res.status(200).json({ success: true, analysis, linkVerification });
   } catch (err) {
     console.error('ATS Analyzer error:', err);
-    if (err.status === 401) {
+    console.dir(err); // Deep log for debugging
+    if (err.status === 401 || err.statusCode === 401) {
       return res.status(500).json({ success: false, error: 'Invalid Groq API key. Please check your .env file.' });
     }
-    if (err.status === 429) {
+    if (err.status === 429 || err.statusCode === 429) {
       return res.status(429).json({ success: false, error: 'Groq rate limit reached. Please wait a moment and try again.' });
     }
-    return res.status(500).json({ success: false, error: 'Analysis failed. Please try again.' });
+    return res.status(500).json({ success: false, error: `Analysis failed: ${err.message || 'Unknown error'}` });
   }
 };
 
