@@ -199,13 +199,22 @@ const getAllUsers = async (req, res, next) => {
 
 const updateProfile = async (req, res, next) => {
   try {
-    const { linkedinUrl } = req.body;
+    const { linkedinUrl, name, studentStatus } = req.body;
     const user = await userRepo.findById(req.userId);
     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    const updatedUser = await userRepo.update(req.userId, {
-      linkedinUrl: linkedinUrl || null,
-    });
+    const updateData = {};
+    if (linkedinUrl !== undefined) updateData.linkedinUrl = linkedinUrl || null;
+    if (name && name.trim()) updateData.name = name.trim();
+    if (studentStatus) {
+      if (['placed', 'unplaced'].includes(studentStatus)) {
+        updateData.studentStatus = studentStatus;
+      } else {
+        return res.status(400).json({ message: 'studentStatus must be placed or unplaced' });
+      }
+    }
+
+    const updatedUser = await userRepo.update(req.userId, updateData);
 
     return res.status(200).json({ message: 'Profile updated', user: sanitizeUser(updatedUser) });
   } catch (error) {

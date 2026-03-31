@@ -3,6 +3,9 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import LandingPage from './components/LandingPage';
 import AuthFlipPage from './components/auth/AuthFlipPage';
 import DashboardPage from './components/dashboard/DashboardPage';
+import Features from './components/pages/Features';
+import Testimonials from './components/pages/Testimonials';
+import Contact from './components/pages/Contact';
 import { SocketProvider } from './context/SocketContext';
 import logo from './logo.png';
 
@@ -26,6 +29,9 @@ function App() {
       <SocketProvider>
         <Routes>
           <Route path="/" element={<LandingPage />} />
+          <Route path="/features" element={<Features />} />
+          <Route path="/testimonials" element={<Testimonials />} />
+          <Route path="/contact" element={<Contact />} />
           <Route path="/auth" element={<AuthFlipPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
         </Routes>

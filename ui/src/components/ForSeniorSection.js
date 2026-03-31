@@ -6,103 +6,112 @@ const seniorFeatures = [
     icon: Briefcase,
     title: 'Executive‑Level Optimization',
     description: 'Tailored feedback for leadership roles – highlight impact, not just responsibilities.',
-    color: 'from-indigo-500 to-blue-500',
+    color: 'from-[#FF6B35] to-[#FF3D00]',
+    bg: 'rgba(255,107,53,0.1)'
   },
   {
     icon: Award,
     title: 'Showcase Achievements',
     description: 'Learn how to quantify your experience and stand out to senior recruiters.',
-    color: 'from-purple-500 to-pink-500',
+    color: 'from-[#E8A430] to-[#FF6B35]',
+    bg: 'rgba(232,164,48,0.1)'
   },
   {
     icon: TrendingUp,
     title: 'Career Transition Support',
     description: 'Switching industries? Get keyword suggestions for your new path.',
-    color: 'from-green-400 to-emerald-500',
+    color: 'from-[#FF3D00] to-[#E8A430]',
+    bg: 'rgba(255,61,0,0.1)'
   },
   {
     icon: Shield,
     title: 'Privacy First',
     description: 'Your data is never shared – we respect your seniority and discretion.',
-    color: 'from-amber-400 to-orange-500',
+    color: 'from-[#FF8C5A] to-[#FF6B35]',
+    bg: 'rgba(255,140,90,0.1)'
   },
 ];
 
 export default function ForSeniorsSection() {
   return (
-    <section className="relative bg-black py-16 md:py-20 overflow-hidden border-y border-white/5">
-      <div className="absolute inset-0 z-0">
-        <div className="absolute top-20 left-1/4 w-72 h-72 bg-indigo-600/15 rounded-full blur-[110px]" />
-        <div className="absolute bottom-10 right-1/4 w-72 h-72 bg-purple-600/15 rounded-full blur-[120px]" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808010_1px,transparent_1px),linear-gradient(to_bottom,#80808010_1px,transparent_1px)] bg-[size:24px_24px]" />
+    <section className="relative py-20 md:py-24 overflow-hidden border-y" style={{ backgroundColor: '#0A0A0A', borderColor: '#1C1C1C', fontFamily: 'DM Sans, sans-serif' }}>
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <div className="absolute top-20 left-1/4 w-[400px] h-[400px] rounded-full blur-[150px] opacity-20" style={{ backgroundColor: '#FF6B35' }} />
+        <div className="absolute bottom-10 right-1/4 w-[400px] h-[400px] rounded-full blur-[150px] opacity-20" style={{ backgroundColor: '#E8A430' }} />
+        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'linear-gradient(to right, #2A2520 1px, transparent 1px), linear-gradient(to bottom, #2A2520 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-10 md:mb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-indigo-300 mb-5">
+      <div className="relative z-10 max-w-7xl mx-auto px-6">
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border text-xs font-bold uppercase tracking-widest mb-6" style={{ backgroundColor: 'rgba(232,164,48,0.1)', borderColor: 'rgba(232,164,48,0.25)', color: '#E8A430', fontFamily: 'JetBrains Mono, monospace' }}>
             <Award size={14} />
             <span>For Experienced Professionals</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white mb-4">
-            Built for Senior Roles, Not Generic Resume Advice
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-6 tracking-tight" style={{ color: '#F5F0EB', fontFamily: 'Syne, sans-serif' }}>
+            Engineered for Senior Roles, <br className="hidden md:block"/> Not Generic Advice
           </h2>
-          <p className="text-base md:text-lg text-gray-400 max-w-3xl mx-auto">
-            Senior resumes need clarity, measurable impact, and strategic positioning. Placify helps you modernize for ATS while preserving executive depth and credibility.
+          <p className="text-lg text-gray-400 max-w-3xl mx-auto font-medium leading-relaxed" style={{ color: '#A89E94' }}>
+            Senior resumes demand clarity, measurable impact, and strategic positioning. Placify modernizes your profile for ATS algorithms while preserving your executive depth.
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-stretch">
-          <div className="lg:col-span-2 bg-white/5 border border-white/10 rounded-2xl p-5 sm:p-6 md:p-8">
-            <h3 className="text-xl font-bold text-white mb-4">What senior candidates need most</h3>
-            <ul className="space-y-3 mb-6">
-              <li className="flex items-start gap-3 text-gray-300 text-sm">
-                <Shield size={18} className="text-indigo-300 shrink-0 mt-0.5" />
-                Position leadership outcomes instead of task lists.
+          <div className="lg:col-span-2 rounded-2xl p-8 transition-colors" style={{ backgroundColor: '#111111', border: '1px solid #2A2520' }}
+            onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(232,164,48,0.3)'}
+            onMouseLeave={e => e.currentTarget.style.borderColor = '#2A2520'}
+          >
+            <h3 className="text-xl font-bold mb-6" style={{ color: '#F5F0EB', fontFamily: 'Syne, sans-serif' }}>What leadership candidates need</h3>
+            <ul className="space-y-4 mb-8 m-0 p-0 list-none">
+              <li className="flex items-start gap-4 text-sm font-medium" style={{ color: '#A89E94' }}>
+                <Shield size={20} className="shrink-0 mt-0.5" style={{ color: '#E8A430' }} />
+                Position leadership outcomes over standard task lists.
               </li>
-              <li className="flex items-start gap-3 text-gray-300 text-sm">
-                <TrendingUp size={18} className="text-indigo-300 shrink-0 mt-0.5" />
+              <li className="flex items-start gap-4 text-sm font-medium" style={{ color: '#A89E94' }}>
+                <TrendingUp size={20} className="shrink-0 mt-0.5" style={{ color: '#E8A430' }} />
                 Quantify business impact with metrics recruiters notice.
               </li>
-              <li className="flex items-start gap-3 text-gray-300 text-sm">
-                <Briefcase size={18} className="text-indigo-300 shrink-0 mt-0.5" />
-                Align language to board, VP, and director-level expectations.
+              <li className="flex items-start gap-4 text-sm font-medium" style={{ color: '#A89E94' }}>
+                <Briefcase size={20} className="shrink-0 mt-0.5" style={{ color: '#E8A430' }} />
+                Align phrasing to board, VP, and Director-level expectations.
               </li>
             </ul>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                <p className="text-xs text-gray-400 mb-1">Executive placements</p>
-                <p className="text-xl sm:text-2xl font-bold text-white">+43%</p>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="rounded-xl p-5" style={{ backgroundColor: '#1C1C1C', border: '1px solid #2A2520' }}>
+                <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: '#5C5550', fontFamily: 'JetBrains Mono, monospace' }}>Exec Placements</p>
+                <p className="text-2xl sm:text-3xl font-black" style={{ color: '#F5F0EB', fontFamily: 'Syne, sans-serif' }}>+43%</p>
               </div>
-              <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                <p className="text-xs text-gray-400 mb-1">Interview rate lift</p>
-                <p className="text-xl sm:text-2xl font-bold text-white">2.5x</p>
+              <div className="rounded-xl p-5" style={{ backgroundColor: '#1C1C1C', border: '1px solid #2A2520' }}>
+                <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: '#5C5550', fontFamily: 'JetBrains Mono, monospace' }}>Interview Lift</p>
+                <p className="text-2xl sm:text-3xl font-black" style={{ color: '#F5F0EB', fontFamily: 'Syne, sans-serif' }}>2.5x</p>
               </div>
             </div>
           </div>
 
           <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-4">
             {seniorFeatures.map((feature, idx) => (
-              <div
-                key={idx}
-                className="bg-white/5 border border-white/10 rounded-2xl p-5 hover:bg-white/10 transition-colors"
+              <div key={idx} className="rounded-2xl p-6 transition-all group cursor-pointer" style={{ backgroundColor: '#111111', border: '1px solid #2A2520' }}
+                onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#1C1C1C'; e.currentTarget.style.borderColor = 'rgba(255,107,53,0.2)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#111111'; e.currentTarget.style.borderColor = '#2A2520'; e.currentTarget.style.transform = 'translateY(0)'; }}
               >
-                <div
-                  className={`w-10 h-10 rounded-lg bg-gradient-to-br ${feature.color} flex items-center justify-center mb-4`}
-                >
-                  <feature.icon size={20} className="text-white" />
+                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-5 shadow-lg group-hover:scale-110 transition-transform`}>
+                  <feature.icon size={22} color="#fff" />
                 </div>
-                <h4 className="text-white font-semibold mb-2">{feature.title}</h4>
-                <p className="text-sm text-gray-400 leading-relaxed">{feature.description}</p>
+                <h4 className="font-bold text-lg mb-2" style={{ color: '#F5F0EB', fontFamily: 'Syne, sans-serif' }}>{feature.title}</h4>
+                <p className="text-sm leading-relaxed font-medium" style={{ color: '#A89E94' }}>{feature.description}</p>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="mt-8 text-center">
-          <button className="group inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white border border-white/10 px-5 py-2.5 rounded-full text-sm font-medium transition-colors">
-            Explore Senior Features
-            <TrendingUp size={16} className="group-hover:translate-x-0.5 transition-transform" />
+        <div className="mt-12 text-center">
+          <button className="group inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold uppercase tracking-wider transition-colors border-none cursor-pointer"
+            style={{ backgroundColor: 'rgba(232,164,48,0.1)', color: '#E8A430', border: '1px solid rgba(232,164,48,0.3)', fontFamily: 'JetBrains Mono, monospace' }}
+            onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(232,164,48,0.2)'; e.currentTarget.style.color = '#F5F0EB'; }}
+            onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'rgba(232,164,48,0.1)'; e.currentTarget.style.color = '#E8A430'; }}
+          >
+            Explore Masterclass
+            <TrendingUp size={16} className="group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
       </div>

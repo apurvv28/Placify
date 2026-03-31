@@ -4,55 +4,39 @@ import { Star, Quote } from 'lucide-react';
 const testimonials = [
   {
     name: 'Nisha K.',
-    role: 'Software Engineer at Google',
-    content:
-      'My resume was getting rejected everywhere. After using Placify, I fixed the missing keywords and got three interview calls within a week!',
-    rating: 5,
-    avatar: 'N',
-    color: 'from-pink-500 to-rose-500',
+    role: 'Software Engineer',
+    company: 'Google',
+    content: 'My resume was getting rejected everywhere. After using Placify, I fixed the missing keywords and got three interview calls within a week!',
+    rating: 5, avatar: 'N',
   },
   {
     name: 'Rahul S.',
-    role: 'Data Scientist at Amazon',
-    content:
-      'The ATS score revealed I was missing crucial skills for data roles. The suggestions were spot‑on and easy to implement.',
-    rating: 5,
-    avatar: 'R',
-    color: 'from-blue-500 to-cyan-500',
+    role: 'Data Scientist',
+    company: 'Amazon',
+    content: 'The ATS score revealed I was missing crucial skills for data roles. The suggestions were spot‑on and easy to implement.',
+    rating: 5, avatar: 'R',
   },
   {
     name: 'Sneha M.',
-    role: 'Product Manager at Microsoft',
-    content:
-      'I loved the library of successful resumes. Seeing what worked for others helped me tailor my own experience.',
-    rating: 5,
-    avatar: 'S',
-    color: 'from-green-400 to-emerald-500',
+    role: 'Product Manager',
+    company: 'Microsoft',
+    content: 'I loved the library of successful resumes. Seeing what worked for others helped me tailor my own experience.',
+    rating: 5, avatar: 'S',
   },
   {
     name: 'Amit R.',
-    role: 'UX Designer (Freelance)',
-    content:
-      'The free analysis gave me a 94% match immediately. Even my portfolio improved because of the feedback.',
-    rating: 4.5,
-    avatar: 'A',
-    color: 'from-amber-400 to-orange-500',
+    role: 'UX Designer',
+    company: 'Freelance',
+    content: 'The free analysis gave me a 94% match immediately. Even my portfolio improved because of the feedback.',
+    rating: 4.5, avatar: 'A',
   },
 ];
 
-const logos = [
-  { name: 'Google', width: 100 },
-  { name: 'Microsoft', width: 120 },
-  { name: 'Amazon', width: 100 },
-  { name: 'Meta', width: 80 },
-  { name: 'Goldman Sachs', width: 140 },
-  { name: 'Deloitte', width: 100 },
-];
+const logos = ['Google', 'Microsoft', 'Amazon', 'Meta', 'Goldman Sachs', 'Deloitte'];
 
 export default function SocialProof() {
   const [activeIndex, setActiveIndex] = useState(0);
 
-  // Auto‑rotate testimonials every 5 seconds
   useEffect(() => {
     const timer = setInterval(() => {
       setActiveIndex((prev) => (prev + 1) % testimonials.length);
@@ -60,82 +44,131 @@ export default function SocialProof() {
     return () => clearInterval(timer);
   }, []);
 
+  const current = testimonials[activeIndex];
+
   return (
-    <section className="relative bg-black py-16 md:py-24 overflow-hidden">
-      <div className="absolute inset-0 z-0">
-        <div className="absolute top-20 right-20 w-80 h-80 bg-indigo-600/20 rounded-full blur-[120px]" />
-        <div className="absolute bottom-20 left-20 w-96 h-96 bg-purple-600/20 rounded-full blur-[150px]" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
-      </div>
+    <section className="relative py-16 md:py-24 overflow-hidden" style={{ backgroundColor: '#0A0A0A' }}>
+
+      {/* Ember radial glow */}
+      <div
+        className="absolute inset-0 z-0 pointer-events-none"
+        style={{ background: 'radial-gradient(ellipse 50% 40% at 60% 70%, rgba(255,107,53,0.07) 0%, transparent 70%)' }}
+      />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        {/* Header */}
         <div className="text-center mb-12 md:mb-16">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mb-4">
+          <h2
+            className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4"
+            style={{ fontFamily: 'Syne, sans-serif', color: '#F5F0EB' }}
+          >
             Trusted by{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">
+            <span style={{
+              backgroundImage: 'linear-gradient(135deg, #FF6B35 0%, #E8A430 100%)',
+              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+            }}>
               10,000+
             </span>{' '}
             Students
           </h2>
-          <p className="text-base md:text-lg text-gray-400 max-w-2xl mx-auto">
+          <p className="text-base md:text-lg max-w-2xl mx-auto" style={{ color: '#A89E94', fontFamily: 'DM Sans, sans-serif' }}>
             See what professionals like you are saying about Placify.
           </p>
         </div>
 
         {/* Company logos */}
-        <div className="flex flex-wrap justify-center items-center gap-5 sm:gap-8 md:gap-12 mb-12 md:mb-20 opacity-70">
+        <div className="flex flex-wrap justify-center items-center gap-5 sm:gap-8 md:gap-12 mb-12 md:mb-20">
           {logos.map((logo, idx) => (
-            <div key={idx} className="text-gray-500 text-sm sm:text-base md:text-xl font-light tracking-wider text-center">
-              {logo.name}
+            <div
+              key={idx}
+              className="text-sm sm:text-base md:text-lg font-light tracking-wider"
+              style={{ color: '#5C5550', fontFamily: 'DM Sans, sans-serif' }}
+            >
+              {logo}
             </div>
           ))}
         </div>
 
         {/* Testimonial carousel */}
         <div className="relative max-w-3xl mx-auto">
-          <Quote className="hidden sm:block absolute -top-6 left-0 text-indigo-500/20 w-12 h-12" />
-          <Quote className="hidden sm:block absolute -bottom-6 right-0 text-indigo-500/20 w-12 h-12 rotate-180" />
+          <Quote
+            className="hidden sm:block absolute -top-6 left-0 w-12 h-12"
+            style={{ color: 'rgba(255,107,53,0.15)' }}
+          />
+          <Quote
+            className="hidden sm:block absolute -bottom-6 right-0 w-12 h-12 rotate-180"
+            style={{ color: 'rgba(255,107,53,0.15)' }}
+          />
 
-          <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-10">
-            {/* Avatar and rating */}
+          <div
+            className="rounded-xl p-5 sm:p-8 md:p-10"
+            style={{ backgroundColor: '#1C1C1C', border: '1px solid #2A2520' }}
+          >
+            {/* Avatar + info */}
             <div className="flex items-center gap-3 sm:gap-4 mb-6">
               <div
-                className={`w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br ${testimonials[activeIndex].color} flex items-center justify-center text-white font-bold text-lg sm:text-2xl shadow-lg`}
+                className="w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center text-white font-bold text-lg sm:text-2xl shadow-lg ring-2"
+                style={{
+                  background: 'linear-gradient(135deg, #FF6B35 0%, #E8A430 100%)',
+                  ringColor: 'rgba(255,107,53,0.4)',
+                  boxShadow: '0 0 0 2px rgba(255,107,53,0.4)',
+                }}
               >
-                {testimonials[activeIndex].avatar}
+                {current.avatar}
               </div>
               <div>
-                <h4 className="text-white font-bold text-base sm:text-lg">{testimonials[activeIndex].name}</h4>
-                <p className="text-gray-400 text-sm">{testimonials[activeIndex].role}</p>
+                <h4 className="font-bold text-base sm:text-lg" style={{ color: '#F5F0EB', fontFamily: 'Syne, sans-serif' }}>
+                  {current.name}
+                </h4>
+                <p className="text-sm" style={{ color: '#A89E94' }}>{current.role}</p>
+                {/* Company badge */}
+                <span
+                  className="inline-block mt-1 px-2 py-0.5 rounded-sm text-xs"
+                  style={{
+                    backgroundColor: 'rgba(232,164,48,0.10)',
+                    color: '#E8A430',
+                    fontFamily: 'JetBrains Mono, monospace',
+                    border: '1px solid rgba(232,164,48,0.20)',
+                  }}
+                >
+                  {current.company}
+                </span>
+                {/* Stars */}
                 <div className="flex gap-1 mt-2">
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      size={16}
-                      className={i < testimonials[activeIndex].rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-600'}
+                      size={14}
+                      style={{
+                        color: i < current.rating ? '#E8A430' : '#2A2520',
+                        fill: i < current.rating ? '#E8A430' : 'none',
+                      }}
                     />
                   ))}
                 </div>
               </div>
             </div>
 
-            {/* Quote */}
-            <p className="text-gray-300 text-base sm:text-lg leading-relaxed">
-              "{testimonials[activeIndex].content}"
+            {/* Quote text */}
+            <p className="text-base sm:text-lg leading-relaxed" style={{ color: '#A89E94', fontFamily: 'DM Sans, sans-serif' }}>
+              "{current.content}"
             </p>
           </div>
 
-          {/* Dots indicator */}
+          {/* Dots */}
           <div className="flex justify-center gap-2 mt-6">
             {testimonials.map((_, idx) => (
               <button
                 key={idx}
                 onClick={() => setActiveIndex(idx)}
-                className={`w-2.5 h-2.5 rounded-full transition-all ${
-                  idx === activeIndex
-                    ? 'bg-indigo-500 w-8'
-                    : 'bg-white/20 hover:bg-white/40'
-                }`}
+                className="h-2 rounded-full transition-all duration-300"
+                style={{
+                  width: idx === activeIndex ? '32px' : '10px',
+                  backgroundColor: idx === activeIndex ? '#FF6B35' : '#2A2520',
+                  border: 'none',
+                  cursor: 'pointer',
+                }}
                 aria-label={`Go to testimonial ${idx + 1}`}
               />
             ))}
