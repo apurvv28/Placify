@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Upload, X, ArrowRight, CheckCircle, FileText, Loader2, Zap } from 'lucide-react';
+import { ResultsPanel } from './dashboard/sections/ATSAnalyzerSection';
 
 const floatingUsers = [
   { id: 1, name: 'Nisha', role: 'Software Engineer', score: '96%', position: { top: '15%', right: '28%' }, delay: '0s', duration: '8s' },
@@ -33,12 +34,12 @@ export default function Hero() {
     const formData = new FormData();
     formData.append('resume', file);
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/parse-resume`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/ats/analyze`, {
         method: 'POST', body: formData,
       });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Failed to upload resume.');
-      setSuccessData(data);
+      if (!response.ok || !data.success) throw new Error(data.error || 'Failed to upload resume.');
+      setSuccessData({ analysis: data.analysis, linkVerification: data.linkVerification || [] });
     } catch (err) {
       setError(err.message || 'Network error encountered.');
     } finally {
@@ -328,34 +329,16 @@ export default function Hero() {
                   className="w-full mt-6 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition px-6 py-3 rounded-lg text-base font-semibold border-none cursor-pointer text-white"
                   style={{ background: 'linear-gradient(135deg, #FF6B35 0%, #FF3D00 100%)' }}
                 >
-                  {loading ? (<><Loader2 size={20} className="animate-spin" />Processing...</>) : 'Analyze Now'}
+                  {loading ? (<><Loader2 size={20} className="animate-spin" />Analyzing with AI...</>) : 'Analyze Now'}
                 </button>
               </form>
             ) : (
-              <div className="space-y-6">
-                <div className="p-4 rounded-xl flex items-start gap-3" style={{ backgroundColor: 'rgba(232,164,48,0.08)', border: '1px solid rgba(232,164,48,0.2)', color: '#E8A430' }}>
-                  <CheckCircle className="shrink-0 mt-0.5" size={20} />
-                  <div><p className="font-semibold m-0">{successData.message}</p></div>
-                </div>
-                <div className="space-y-2">
-                  <h3 className="text-sm font-semibold flex items-center gap-2 m-0" style={{ color: '#A89E94' }}>
-                    <FileText size={16} /> Data Extracted Preview:
-                  </h3>
-                  <div className="rounded-lg p-4 h-48 overflow-y-auto custom-scrollbar" style={{ backgroundColor: 'rgba(0,0,0,0.3)', border: '1px solid #2A2520' }}>
-                    <p className="text-xs leading-relaxed whitespace-pre-wrap m-0" style={{ color: '#5C5550', fontFamily: 'JetBrains Mono, monospace' }}>
-                      {successData.snippet}...
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={closeModal}
-                  className="w-full transition px-6 py-3 rounded-lg text-base font-semibold cursor-pointer"
-                  style={{ backgroundColor: '#1C1C1C', border: '1px solid #2A2520', color: '#A89E94' }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,107,53,0.4)'; e.currentTarget.style.color = '#F5F0EB'; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = '#2A2520'; e.currentTarget.style.color = '#A89E94'; }}
-                >
-                  Close & View Full Report (Coming Soon)
-                </button>
+              <div className="space-y-6 pt-4">
+                <ResultsPanel 
+                  analysis={successData.analysis} 
+                  linkVerification={successData.linkVerification} 
+                  onReset={() => { setSuccessData(null); setFile(null); }} 
+                />
               </div>
             )}
           </div>

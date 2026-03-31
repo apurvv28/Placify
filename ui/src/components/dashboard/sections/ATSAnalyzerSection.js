@@ -1,4 +1,5 @@
 import React, { useState, useRef, useCallback } from 'react';
+import { generatePdfReport } from '../../../utils/generatePdfReport';
 
 const BACKEND = (process.env.REACT_APP_API_URL || 'http://localhost:5000');
 
@@ -346,16 +347,36 @@ function UploadPanel({ onAnalyze, loading, error }) {
   );
 }
 
-function ResultsPanel({ analysis, linkVerification, onReset }) {
+export function ResultsPanel({ analysis, linkVerification, onReset }) {
   const { score, scoreRationale, detectedRole, sectionNotes, keywordMatch, formattingIssues, improvementChecklist, nextSteps } = analysis;
   const sc = scoreColor(score);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+
+  const handleDownloadPdf = async () => {
+    setIsGeneratingPdf(true);
+    try {
+      await generatePdfReport(analysis, linkVerification, 'Candidate');
+    } finally {
+      setIsGeneratingPdf(false);
+    }
+  };
 
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold border-l-2 pl-3" style={{ fontFamily: 'Syne, sans-serif', color: '#F5F0EB', borderLeftColor: '#FF6B35' }}>ATS Resume Analyzer</h1>
-          {detectedRole && <p className="text-sm mt-0.5 pl-3" style={{ color: '#A89E94', fontFamily: 'DM Sans, sans-serif' }}>Analyzed for: <span style={{ color: '#FF6B35', fontWeight: 600 }}>{detectedRole}</span></p>}
+          <h1 className="text-2xl font-bold border-l-2 pl-3 flex items-center gap-3" style={{ fontFamily: 'Syne, sans-serif', color: '#F5F0EB', borderLeftColor: '#FF6B35' }}>
+            ATS Resume Analyzer
+            <button 
+              onClick={handleDownloadPdf}
+              disabled={isGeneratingPdf}
+              className="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-50 border-none cursor-pointer text-[#F5F0EB]"
+              style={{ backgroundColor: '#FF6B35', fontFamily: 'JetBrains Mono, monospace' }}
+            >
+              {isGeneratingPdf ? 'Generating...' : 'Download PDF'}
+            </button>
+          </h1>
+          {detectedRole && <p className="text-sm mt-1 pl-3" style={{ color: '#A89E94', fontFamily: 'DM Sans, sans-serif' }}>Analyzed for: <span style={{ color: '#FF6B35', fontWeight: 600 }}>{detectedRole}</span></p>}
         </div>
         <button type="button" onClick={onReset} className="text-sm transition-colors self-start sm:self-auto border-none cursor-pointer bg-transparent" style={{ color: '#FF6B35', fontFamily: 'DM Sans, sans-serif' }}
           onMouseEnter={e => e.currentTarget.style.color = '#E8A430'}
