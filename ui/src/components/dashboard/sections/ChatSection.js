@@ -286,24 +286,24 @@ export default function ChatSection({ preselectedUser = null }) {
       <div className={`flex flex-col w-full lg:w-[380px] border-r border-[#2A2520] bg-[#111111] ${selectedUser ? 'hidden lg:flex' : 'flex'}`}>
         
         {/* Header */}
-        <div className="p-6 border-b border-[#2A2520] flex items-center justify-between bg-[#1C1C1C]/30 backdrop-blur-xl">
-          <div className="flex items-center gap-4">
+        <div className="p-4 sm:p-6 border-b border-[#2A2520] flex items-center justify-between bg-[#1C1C1C]/30 backdrop-blur-xl">
+          <div className="flex items-center gap-3 sm:gap-4">
              <div 
               onClick={() => handleViewProfile({...currentUser, name: currentUser.name || 'My Profile'})}
-              className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#FF6B35] to-[#E8A430] flex items-center justify-center cursor-pointer hover:rotate-3 transition-all duration-300 font-bold border border-[#2A2520] shadow-lg overflow-hidden group"
+              className="w-10 h-10 sm:w-12 sm:h-12 rounded-[14px] sm:rounded-2xl bg-gradient-to-br from-[#FF6B35] to-[#E8A430] flex items-center justify-center cursor-pointer hover:rotate-3 transition-all duration-300 font-bold border border-[#2A2520] shadow-lg overflow-hidden group shrink-0"
              >
                {currentUser.avatar ? 
                  <img src={currentUser.avatar} alt="Me" className="w-full h-full object-cover group-hover:scale-110 transition-transform" /> : 
-                 <span className="text-white text-lg">{currentUser.name?.charAt(0).toUpperCase()}</span>
+                 <span className="text-white text-base sm:text-lg">{currentUser.name?.charAt(0).toUpperCase()}</span>
                }
              </div>
              <div>
-               <h2 className="text-[10px] font-['JetBrains_Mono']l font-extrabold font-['Syne'] text-white tracking-tight">Messages</h2>
-               <p className="text-[10px] text-[#FF6B35] font-bold uppercase tracking-widest">Placify Network</p>
+               <h2 className="text-[10px] sm:text-[11px] font-['JetBrains_Mono']l font-extrabold font-['Syne'] text-white tracking-tight">Messages</h2>
+               <p className="text-[9px] sm:text-[10px] text-[#FF6B35] font-bold uppercase tracking-widest">Placify Network</p>
              </div>
           </div>
           <button className="text-[#A89E94] hover:text-white p-2 rounded-xl hover:bg-white/5 transition-all">
-            <MoreVertical size={20} />
+            <MoreVertical className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
         </div>
 
@@ -336,16 +336,16 @@ export default function ChatSection({ preselectedUser = null }) {
               >
                 {/* Avatar */}
                 <div className="relative shrink-0">
-                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-white font-bold text-[10px] font-['JetBrains_Mono']l border-2 transition-all group-hover:scale-105 ${
+                  <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-[14px] sm:rounded-2xl flex items-center justify-center text-white font-bold text-[10px] font-['JetBrains_Mono']l border-2 transition-all group-hover:scale-105 ${
                     selectedUser?._id === user._id ? 'border-[#FF6B35] shadow-lg' : 'border-[#2A2520]'
                   } bg-gradient-to-br ${
                     user.role === 'Placed' ? 'from-[#E8A430] to-[#E8A430]' : 
                     user.role === 'Professional' ? 'from-[#FF6B35] to-[#FF6B35]' : 'from-[#FF3D00] to-[#E8A430]'
                   }`}>
-                    {user.avatar ? <img src={user.avatar} alt={user.name} className="w-full h-full rounded-2xl object-cover" /> : user.name.charAt(0).toUpperCase()}
+                    {user.avatar ? <img src={user.avatar} alt={user.name} className="w-full h-full rounded-[14px] sm:rounded-2xl object-cover" /> : user.name.charAt(0).toUpperCase()}
                   </div>
                   {onlineUsers.includes(user._id) && (
-                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-[#111111] rounded-full shadow-lg" />
+                    <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 sm:w-4 sm:h-4 bg-emerald-500 border-2 border-[#111111] rounded-full shadow-lg" />
                   )}
                 </div>
 
@@ -402,30 +402,30 @@ export default function ChatSection({ preselectedUser = null }) {
         {selectedUser ? (
           <>
             {/* Header */}
-            <div className="px-8 py-5 border-b border-[#2A2520] bg-[#111111]/80 backdrop-blur-2xl flex items-center justify-between shrink-0 z-10 shadow-[0_1px_3px_rgba(0,0,0,0.3)]">
-              <div className="flex items-center gap-5 cursor-pointer group" onClick={() => handleViewProfile(selectedUser)}>
+            <div className="px-4 py-3 sm:px-8 sm:py-5 border-b border-[#2A2520] bg-[#111111]/80 backdrop-blur-2xl flex items-center justify-between shrink-0 z-10 shadow-[0_1px_3px_rgba(0,0,0,0.3)]">
+              <div className="flex items-center gap-3 sm:gap-5 cursor-pointer group" onClick={() => handleViewProfile(selectedUser)}>
                 <button 
                   onClick={(e) => { e.stopPropagation(); setSelectedUser(null); }} 
-                  className="lg:hidden p-2 -ml-2 text-[#A89E94] hover:text-white hover:bg-white/5 rounded-xl transition-all"
+                  className="lg:hidden p-1.5 sm:p-2 -ml-2 text-[#A89E94] hover:text-white hover:bg-white/5 rounded-xl transition-all"
                 >
-                  <ArrowLeft size={24} />
+                  <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6" />
                 </button>
-                <div className="relative">
-                   <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white font-bold text-[10px] font-['JetBrains_Mono']l bg-gradient-to-br shadow-xl group-hover:scale-105 transition-transform ${
+                <div className="relative shrink-0">
+                   <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-[14px] sm:rounded-2xl flex items-center justify-center text-white font-bold text-[10px] font-['JetBrains_Mono']l bg-gradient-to-br shadow-xl group-hover:scale-105 transition-transform ${
                     selectedUser.role === 'Placed' ? 'from-[#E8A430] to-[#E8A430]' : 
                     selectedUser.role === 'Professional' ? 'from-[#FF6B35] to-[#FF3D00]' : 'from-[#FF3D00] to-[#E8A430]'
                   }`}>
-                    {selectedUser.avatar ? <img src={selectedUser.avatar} alt="User" className="w-full h-full rounded-2xl object-cover" /> : selectedUser.name.charAt(0).toUpperCase()}
+                    {selectedUser.avatar ? <img src={selectedUser.avatar} alt="User" className="w-full h-full rounded-[14px] sm:rounded-2xl object-cover" /> : selectedUser.name.charAt(0).toUpperCase()}
                   </div>
                   {onlineUsers.includes(selectedUser._id) && (
-                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-[#111111] rounded-full shadow-lg" />
+                    <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 sm:w-4 sm:h-4 bg-emerald-500 border-2 border-[#111111] rounded-full shadow-lg" />
                   )}
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-white tracking-tight leading-none mb-1.5">{selectedUser.name}</h3>
+                  <h3 className="text-base sm:text-lg font-bold text-white tracking-tight leading-none mb-1.5">{selectedUser.name}</h3>
                   <div className="flex items-center gap-2">
-                    <span className={`w-2 h-2 rounded-full ${onlineUsers.includes(selectedUser._id) ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-slate-600'}`}></span>
-                    <p className={`text-[11px] font-bold uppercase tracking-widest ${onlineUsers.includes(selectedUser._id) ? 'text-emerald-400' : 'text-[#5C5550]'}`}>
+                    <span className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${onlineUsers.includes(selectedUser._id) ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-slate-600'}`}></span>
+                    <p className={`text-[9px] sm:text-[11px] font-bold uppercase tracking-widest ${onlineUsers.includes(selectedUser._id) ? 'text-emerald-400' : 'text-[#5C5550]'}`}>
                       {onlineUsers.includes(selectedUser._id) ? 'ACTIVE NOW' : 'OFFLINE'}
                     </p>
                   </div>
@@ -463,13 +463,13 @@ export default function ChatSection({ preselectedUser = null }) {
             </div>
 
             {/* Messages Area - PROFESSIONAL DARK OVERHAUL */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar relative bg-[#0A0A0A] professional-chat-bg">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-6 custom-scrollbar relative bg-[#0A0A0A] professional-chat-bg">
               {/* Subtle background overlay */}
               <div className="absolute inset-0 bg-gradient-to-b from-indigo-500/[0.02] to-purple-500/[0.02] pointer-events-none" />
               
-              <div className="flex justify-center mb-10 relative z-10">
-                <div className="bg-[#FF6B35]/10 backdrop-blur-md border border-[#FF6B35]/20 px-5 py-2.5 rounded-2xl text-[11px] text-[#FF6B35] shadow-xl flex items-center gap-3 max-w-sm text-center font-bold tracking-wide">
-                  <Shield size={14} className="text-[#FF6B35] shrink-0" />
+              <div className="flex justify-center mb-6 sm:mb-10 relative z-10">
+                <div className="bg-[#FF6B35]/10 backdrop-blur-md border border-[#FF6B35]/20 px-4 py-2 sm:px-5 sm:py-2.5 rounded-2xl text-[9px] sm:text-[11px] text-[#FF6B35] shadow-xl flex items-center gap-2 sm:gap-3 max-w-[90%] sm:max-w-sm text-center font-bold tracking-wide">
+                  <Shield className="w-3.5 h-3.5 sm:w-[14px] sm:h-[14px] text-[#FF6B35] shrink-0" />
                   THIS CONVERSATION IS PROTECTED BY ENTERPRISE ENCRYPTION
                 </div>
               </div>
@@ -482,8 +482,8 @@ export default function ChatSection({ preselectedUser = null }) {
                 return (
                   <React.Fragment key={msg._id || idx}>
                     {showDate && (
-                      <div className="flex justify-center my-8 relative z-10">
-                        <span className="px-5 py-1.5 bg-[#1C1C1C]/50 backdrop-blur-lg text-[10px] font-black text-[#A89E94] rounded-full uppercase tracking-[0.2em] border border-[#2A2520] shadow-lg">
+                      <div className="flex justify-center my-6 sm:my-8 relative z-10">
+                        <span className="px-4 py-1 sm:px-5 sm:py-1.5 bg-[#1C1C1C]/50 backdrop-blur-lg text-[9px] sm:text-[10px] font-black text-[#A89E94] rounded-full uppercase tracking-[0.2em] border border-[#2A2520] shadow-lg">
                           {getDateLabel(msg.createdAt)}
                         </span>
                       </div>
@@ -494,13 +494,13 @@ export default function ChatSection({ preselectedUser = null }) {
                           e.preventDefault();
                           setReactionSource({ messageId: msg._id, x: e.clientX, y: e.clientY });
                         }}
-                        className={`relative max-w-[70%] px-5 py-3.5 rounded-3xl shadow-xl transition-all duration-300 hover:scale-[1.01] ${
+                        className={`relative max-w-[85%] sm:max-w-[70%] px-4 py-2.5 sm:px-5 sm:py-3.5 rounded-2xl sm:rounded-3xl shadow-xl transition-all duration-300 hover:scale-[1.01] ${
                           isMine 
                             ? 'bg-gradient-to-br from-[#FF6B35] to-[#FF3D00] text-white rounded-tr-none shadow-[#FF6B35]/20' 
                             : 'bg-[#1C1C1C] text-[#F5F0EB] rounded-tl-none border border-[#2A2520] shadow-black/40'
                         }`}
                       >
-                        <div className="text-[15px] pr-4 pb-2 leading-relaxed font-medium">
+                        <div className="text-[14px] sm:text-[15px] pr-2 sm:pr-4 pb-2 leading-relaxed font-medium">
                           {msg.text}
                         </div>
 
@@ -545,52 +545,52 @@ export default function ChatSection({ preselectedUser = null }) {
             </div>
 
             {/* Input Bar - PROFESSIONAL DARK */}
-            <div className="p-6 bg-[#111111] border-t border-[#2A2520] shrink-0 relative z-20 shadow-[0_-10px_30px_rgba(0,0,0,0.3)]">
+            <div className="p-3 sm:p-6 bg-[#111111] border-t border-[#2A2520] shrink-0 relative z-20 shadow-[0_-10px_30px_rgba(0,0,0,0.3)]">
               {showEmojiPicker && (
-                <div className="absolute bottom-full left-6 mb-4 z-50 shadow-2xl rounded-3xl overflow-hidden ring-1 ring-white/10">
+                <div className="absolute bottom-full left-3 sm:left-6 mb-2 sm:mb-4 z-50 shadow-2xl rounded-2xl sm:rounded-3xl overflow-hidden ring-1 ring-white/10 max-h-[300px] overflow-y-auto">
                   <EmojiPicker theme="dark" onEmojiClick={(emojiData) => setNewMessageText(prev => prev + emojiData.emoji)} />
                 </div>
               )}
               
               {selectedUser.isBlocked ? (
-                <div className="flex flex-col items-center justify-center p-6 bg-red-500/5 rounded-3xl border border-red-500/10 backdrop-blur-sm">
-                  <p className="text-sm font-['DM_Sans'] text-red-400 mb-4 font-bold tracking-tight">Access restricted for this contact</p>
-                  <button onClick={handleBlockUser} className="px-10 py-3 bg-[#FF6B35] text-white rounded-2xl text-[10px] font-['JetBrains_Mono']s font-black shadow-lg shadow-[#FF6B35]/40 hover:scale-105 active:scale-95 transition-all uppercase tracking-widest">
+                <div className="flex flex-col items-center justify-center p-4 sm:p-6 bg-red-500/5 rounded-[20px] sm:rounded-3xl border border-red-500/10 backdrop-blur-sm">
+                  <p className="text-xs sm:text-sm font-['DM_Sans'] text-red-400 mb-3 sm:mb-4 font-bold tracking-tight text-center">Access restricted for this contact</p>
+                  <button onClick={handleBlockUser} className="px-6 py-2 sm:px-10 sm:py-3 bg-[#FF6B35] text-white rounded-xl sm:rounded-2xl text-[10px] font-['JetBrains_Mono']s font-black shadow-lg shadow-[#FF6B35]/40 hover:scale-105 active:scale-95 transition-all uppercase tracking-widest text-center">
                     Restore Communication
                   </button>
                 </div>
               ) : (
-                <form onSubmit={handleSendMessage} className="flex items-center gap-4">
-                  <div className="flex items-center gap-1 bg-[#1C1C1C] p-1 rounded-2xl border border-[#2A2520]">
+                <form onSubmit={handleSendMessage} className="flex items-center gap-2 sm:gap-4">
+                  <div className="flex items-center gap-1 bg-[#1C1C1C] p-1 rounded-[14px] sm:rounded-2xl border border-[#2A2520]">
                     <button 
                       type="button" 
                       onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                      className={`p-3 transition-all rounded-xl ${showEmojiPicker ? 'text-[#FF6B35] bg-[#FF6B35]/10' : 'text-[#A89E94] hover:text-white hover:bg-white/5'}`}
+                      className={`p-2 sm:p-3 transition-all rounded-[10px] sm:rounded-xl ${showEmojiPicker ? 'text-[#FF6B35] bg-[#FF6B35]/10' : 'text-[#A89E94] hover:text-white hover:bg-white/5'}`}
                     >
-                      <Smile size={22} />
+                      <Smile className="w-5 h-5 sm:w-[22px] sm:h-[22px]" />
                     </button>
                     <button 
                       type="button" 
-                      className="p-3 text-[#A89E94] hover:text-white hover:bg-white/5 rounded-xl transition-all"
+                      className="p-2 sm:p-3 text-[#A89E94] hover:text-white hover:bg-white/5 rounded-[10px] sm:rounded-xl transition-all hidden sm:block"
                     >
-                      <Paperclip size={20} />
+                      <Paperclip className="w-4 h-4 sm:w-5 sm:h-5" />
                     </button>
                   </div>
                   <div className="flex-1 relative">
                     <input 
                       type="text"
-                      placeholder="Share your professional thoughts..."
+                      placeholder="Type a message..."
                       value={newMessageText}
                       onChange={(e) => setNewMessageText(e.target.value)}
-                      className="w-full bg-[#1C1C1C] border border-[#2A2520] outline-none py-4 px-6 rounded-3xl text-[15px] text-white placeholder:text-[#5C5550] shadow-inner focus:ring-2 focus:ring-[#FF6B35]/50 transition-all font-medium"
+                      className="w-full bg-[#1C1C1C] border border-[#2A2520] outline-none py-3 px-4 sm:py-4 sm:px-6 rounded-[20px] sm:rounded-3xl text-[14px] sm:text-[15px] text-white placeholder:text-[#5C5550] shadow-inner focus:ring-2 focus:ring-[#FF6B35]/50 transition-all font-medium"
                     />
                   </div>
                   <button 
                     type="submit"
                     disabled={!newMessageText.trim()}
-                    className={`p-4 rounded-2xl transition-all duration-300 shadow-xl ${newMessageText.trim() ? 'bg-[#FF6B35] text-white hover:scale-105 hover:shadow-[#FF6B35]/30 active:scale-95' : 'bg-[#1C1C1C] text-[#5C5550]'}`}
+                    className={`p-3 sm:p-4 rounded-[16px] sm:rounded-2xl transition-all duration-300 shadow-xl shrink-0 border-none cursor-pointer ${newMessageText.trim() ? 'bg-[#FF6B35] text-white hover:scale-105 hover:shadow-[#FF6B35]/30 active:scale-95' : 'bg-[#1C1C1C] text-[#5C5550]'}`}
                   >
-                    <Send size={22} fill={newMessageText.trim() ? 'currentColor' : 'none'} className={newMessageText.trim() ? 'rotate-[-10deg]' : ''} />
+                    <Send className={`w-5 h-5 sm:w-[22px] sm:h-[22px] ${newMessageText.trim() ? 'rotate-[-10deg]' : ''}`} fill={newMessageText.trim() ? 'currentColor' : 'none'} />
                   </button>
                 </form>
               )}
@@ -636,28 +636,28 @@ export default function ChatSection({ preselectedUser = null }) {
         <div className="absolute inset-0 bg-[#0A0A0A]/80 backdrop-blur-md z-[100] flex justify-end animate-in fade-in duration-500">
           <div className="w-full sm:w-[420px] bg-[#111111] h-full shadow-[0_0_100px_rgba(0,0,0,0.8)] border-l border-[#2A2520] flex flex-col animate-in slide-in-from-right duration-500">
             {/* Header */}
-            <div className="p-8 flex items-center justify-between bg-[#1C1C1C]/30">
+            <div className="p-4 sm:p-8 flex items-center justify-between bg-[#1C1C1C]/30">
               <h2 className="text-[10px] font-['JetBrains_Mono']l font-bold text-white tracking-tight">Profile Details</h2>
               <button 
                 onClick={() => setShowProfileSidebar(false)}
-                className="p-3 bg-white/5 hover:bg-white/10 rounded-2xl text-[#A89E94] hover:text-white transition-all shadow-lg"
+                className="p-2 sm:p-3 bg-white/5 hover:bg-white/10 rounded-[12px] sm:rounded-2xl text-[#A89E94] hover:text-white transition-all shadow-lg border-none"
               >
-                <X size={20} />
+                <X className="w-5 h-5" />
               </button>
             </div>
             
             {/* Content */}
-            <div className="flex-1 overflow-y-auto p-10 flex flex-col items-center">
-               <div className="relative mb-8 group">
-                 <div className="absolute inset-0 bg-indigo-500/20 rounded-[50px] blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-                 <div className={`w-48 h-48 rounded-[60px] flex items-center justify-center text-white font-black text-6xl shadow-2xl relative border-[6px] border-[#111111] bg-gradient-to-br transform group-hover:rotate-2 transition-all duration-500 overflow-hidden ${
+            <div className="flex-1 overflow-y-auto p-6 sm:p-10 flex flex-col items-center">
+               <div className="relative mb-6 sm:mb-8 group">
+                 <div className="absolute inset-0 bg-indigo-500/20 rounded-[40px] sm:rounded-[50px] blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+                 <div className={`w-32 h-32 sm:w-48 sm:h-48 rounded-[40px] sm:rounded-[60px] flex items-center justify-center text-white font-black text-4xl sm:text-6xl shadow-2xl relative border-[4px] sm:border-[6px] border-[#111111] bg-gradient-to-br transform group-hover:rotate-2 transition-all duration-500 overflow-hidden ${
                     viewingProfile.role?.includes('Placed') ? 'from-[#E8A430] to-[#E8A430]' : 
                     viewingProfile.role?.includes('Professional') ? 'from-[#FF6B35] to-[#FF3D00]' : 'from-[#FF3D00] to-[#E8A430]'
                  }`}>
                    {viewingProfile.avatar ? <img src={viewingProfile.avatar} alt="Profile" className="w-full h-full object-cover" /> : viewingProfile.name?.charAt(0).toUpperCase()}
                  </div>
                  {onlineUsers.includes(viewingProfile._id) && (
-                   <div className="absolute bottom-4 right-4 w-6 h-6 bg-emerald-500 border-4 border-[#111111] rounded-full shadow-xl" />
+                   <div className="absolute bottom-2 right-2 sm:bottom-4 sm:right-4 w-4 h-4 sm:w-6 sm:h-6 bg-emerald-500 border-2 sm:border-4 border-[#111111] rounded-full shadow-xl" />
                  )}
                </div>
                

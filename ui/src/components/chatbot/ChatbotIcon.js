@@ -87,16 +87,16 @@ export default function ChatbotIcon() {
   };
 
   return (
-    <div className="fixed bottom-10 right-10 z-[100] font-sans">
+    <div className="fixed bottom-4 right-4 sm:bottom-10 sm:right-10 z-[100] font-sans">
       {/* Bot Icon Button - SLEEK RINGS */}
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="relative group p-5 rounded-[24px] bg-gradient-to-br from-[#FF6B35] to-[#FF3D00] text-white shadow-2xl shadow-[#FF6B35]/40 hover:shadow-[#FF6B35]/60 hover:scale-110 active:scale-95 transition-all duration-500 group animate-pulse"
+          className="relative group p-4 sm:p-5 rounded-[20px] sm:rounded-[24px] bg-gradient-to-br from-[#FF6B35] to-[#FF3D00] text-white shadow-2xl shadow-[#FF6B35]/40 hover:shadow-[#FF6B35]/60 hover:scale-110 active:scale-95 transition-all duration-500 group animate-pulse"
         >
-          <div className="absolute inset-0 rounded-[24px] border-2 border-white/20 animate-ping opacity-20 group-hover:opacity-40" />
-          <Sparkles className="absolute -top-2 -right-2 w-5 h-5 text-[#E8A430] animate-pulse drop-shadow-lg" />
-          <Bot size={32} />
+          <div className="absolute inset-0 rounded-[20px] sm:rounded-[24px] border-2 border-white/20 animate-ping opacity-20 group-hover:opacity-40" />
+          <Sparkles className="absolute -top-2 -right-2 w-4 h-4 sm:w-5 sm:h-5 text-[#E8A430] animate-pulse drop-shadow-lg" />
+          <Bot className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
           {/* Tooltip */}
           <span className="absolute right-full mr-6 top-1/2 -translate-y-1/2 px-4 py-2 rounded-2xl bg-[#111111] border border-white/10 text-[11px] font-black uppercase tracking-[0.15em] text-[#FF6B35] whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-300 transform translate-x-4 group-hover:translate-x-0 shadow-2xl">
             CONSULT PLACIFY AI
@@ -106,15 +106,15 @@ export default function ChatbotIcon() {
 
       {/* Chat Window - PREMIUM DESIGN */}
       {isOpen && (
-        <div className="w-[380px] sm:w-[420px] h-[600px] max-h-[85vh] flex flex-col bg-[#0A0A0A] border border-[#2A2520] rounded-[32px] shadow-[0_50px_100px_rgba(0,0,0,0.8)] overflow-hidden animate-in zoom-in-95 fade-in slide-in-from-bottom-10 duration-500 ring-1 ring-white/5">
+        <div className="w-[calc(100vw-32px)] sm:w-[420px] h-[75vh] sm:h-[600px] max-h-[85vh] flex flex-col bg-[#0A0A0A] border border-[#2A2520] rounded-[24px] sm:rounded-[32px] shadow-[0_50px_100px_rgba(0,0,0,0.8)] overflow-hidden animate-in zoom-in-95 fade-in slide-in-from-bottom-10 duration-500 ring-1 ring-white/5">
           
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-5 bg-[#111111]/90 backdrop-blur-3xl border-b border-[#2A2520] relative overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-3 sm:px-6 sm:py-5 bg-[#111111]/90 backdrop-blur-3xl border-b border-[#2A2520] relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#FF6B35] to-transparent" />
             
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#FF6B35] to-[#FF3D00] flex items-center justify-center shadow-lg transform rotate-[-5deg] ring-1 ring-white/10">
-                <Bot size={22} className="text-white" />
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-[12px] sm:rounded-[16px] bg-gradient-to-br from-[#FF6B35] to-[#FF3D00] flex items-center justify-center shadow-lg transform rotate-[-5deg] ring-1 ring-white/10">
+                <Bot className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
               <div>
                 <h3 className="font-black text-sm text-[#F5F0EB] tracking-tight uppercase" style={{fontFamily: 'Syne, sans-serif'}}>Placify <span className="text-[#FF6B35]">Intelligence</span></h3>
@@ -133,21 +133,21 @@ export default function ChatbotIcon() {
           </div>
 
           {/* Messages Area - PROFESSIONAL BACKGROUND */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar bg-[#0A0A0A] professional-chatbot-bg relative">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-6 custom-scrollbar bg-[#0A0A0A] professional-chatbot-bg relative">
             {/* Subtle background overlay */}
             <div className="absolute inset-0 bg-gradient-to-b from-indigo-500/5 via-transparent to-transparent pointer-events-none" />
             
             {messages.map((msg) => (
-              <div key={msg.id} className={`flex items-start gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : ''} relative z-10`}>
-                <div className={`w-9 h-9 rounded-2xl flex items-center justify-center shrink-0 shadow-xl transition-transform hover:scale-105 ${
+              <div key={msg.id} className={`flex items-start gap-3 sm:gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : ''} relative z-10`}>
+                <div className={`w-7 h-7 sm:w-9 sm:h-9 rounded-[10px] sm:rounded-2xl flex items-center justify-center shrink-0 shadow-xl transition-transform hover:scale-105 ${
                   msg.role === 'user' 
                     ? 'bg-[#1C1C1C] text-[#FF6B35] border border-[#2A2520]' 
                     : 'bg-gradient-to-br from-[#FF6B35] to-[#FF3D00] text-white transform rotate-[-3deg]'
                 }`}>
-                  {msg.role === 'user' ? <User size={18} /> : <Bot size={18} />}
+                  {msg.role === 'user' ? <User className="w-4 h-4 sm:w-[18px] sm:h-[18px]" /> : <Bot className="w-4 h-4 sm:w-[18px] sm:h-[18px]" />}
                 </div>
-                <div className={`flex flex-col gap-2 max-w-[75%] ${msg.role === 'user' ? 'items-end' : ''}`}>
-                  <div className={`rounded-3xl px-5 py-3.5 text-[14px] leading-relaxed shadow-lg ${
+                <div className={`flex flex-col gap-1.5 sm:gap-2 max-w-[80%] sm:max-w-[75%] ${msg.role === 'user' ? 'items-end' : ''}`}>
+                  <div className={`rounded-2xl sm:rounded-3xl px-4 py-2.5 sm:px-5 sm:py-3.5 text-[13px] sm:text-[14px] leading-relaxed shadow-lg ${
                     msg.role === 'user' 
                       ? 'bg-[#FF6B35] text-white rounded-tr-none font-medium shadow-[#FF6B35]/20' 
                       : 'bg-[#111111] text-[#F5F0EB] border border-[#2A2520] rounded-tl-none bot-message-content shadow-black/40'
@@ -158,7 +158,7 @@ export default function ChatbotIcon() {
                       <p className="m-0">{msg.text}</p>
                     )}
                   </div>
-                  <span className={`text-[9px] font-bold text-[#A89E94] uppercase tracking-widest ${msg.role === 'user' ? 'mr-2' : 'ml-2'}`} style={{fontFamily: 'JetBrains Mono, monospace'}}>
+                  <span className={`text-[8px] sm:text-[9px] font-bold text-[#A89E94] uppercase tracking-widest ${msg.role === 'user' ? 'mr-1 sm:mr-2' : 'ml-1 sm:ml-2'}`} style={{fontFamily: 'JetBrains Mono, monospace'}}>
                     {formatTime(msg.timestamp)}
                   </span>
                 </div>
@@ -166,14 +166,14 @@ export default function ChatbotIcon() {
             ))}
             
             {isTyping && (
-              <div className="flex items-start gap-4 animate-in fade-in duration-300">
-                <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-[#FF6B35] to-[#FF3D00] flex items-center justify-center text-white shrink-0 shadow-xl rotate-[-3deg]">
-                  <Bot size={18} />
+              <div className="flex items-start gap-3 sm:gap-4 animate-in fade-in duration-300">
+                <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-[10px] sm:rounded-2xl bg-gradient-to-br from-[#FF6B35] to-[#FF3D00] flex items-center justify-center text-white shrink-0 shadow-xl rotate-[-3deg]">
+                  <Bot className="w-4 h-4 sm:w-[18px] sm:h-[18px]" />
                 </div>
-                <div className="bg-[#111111] border border-[#2A2520] rounded-3xl rounded-tl-none px-6 py-4 flex gap-2 shadow-lg">
-                  <span className="w-2 h-2 bg-[#FF6B35] rounded-full animate-bounce [animation-delay:-0.3s]" />
-                  <span className="w-2 h-2 bg-[#FF6B35] rounded-full animate-bounce [animation-delay:-0.15s]" />
-                  <span className="w-2 h-2 bg-[#FF6B35] rounded-full animate-bounce" />
+                <div className="bg-[#111111] border border-[#2A2520] rounded-2xl sm:rounded-3xl rounded-tl-none px-4 py-3 sm:px-6 sm:py-4 flex gap-2 shadow-lg">
+                  <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#FF6B35] rounded-full animate-bounce [animation-delay:-0.3s]" />
+                  <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#FF6B35] rounded-full animate-bounce [animation-delay:-0.15s]" />
+                  <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#FF6B35] rounded-full animate-bounce" />
                 </div>
               </div>
             )}
@@ -182,12 +182,12 @@ export default function ChatbotIcon() {
 
           {/* Quick Suggestions - SLEEK CHIPS */}
           {messages.length < 3 && !isTyping && (
-             <div className="px-6 py-4 flex gap-3 overflow-x-auto no-scrollbar bg-[#111111]/60 backdrop-blur-md border-t border-[#2A2520]">
+             <div className="px-4 py-3 sm:px-6 sm:py-4 flex gap-2 sm:gap-3 overflow-x-auto no-scrollbar bg-[#111111]/60 backdrop-blur-md border-t border-[#2A2520]">
                {SUGGESTIONS.map((s, i) => (
                  <button
                    key={i}
                    onClick={() => handleSend(s)}
-                   className="whitespace-nowrap px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-wider border border-[rgba(255,107,53,0.2)] bg-[rgba(255,107,53,0.05)] text-[#FF6B35] hover:bg-[#FF6B35] hover:text-white hover:shadow-lg hover:shadow-[#FF6B35]/20 transition-all duration-300 active:scale-95"
+                   className="whitespace-nowrap px-3 py-1.5 sm:px-4 sm:py-2 rounded-[10px] sm:rounded-xl text-[10px] sm:text-[11px] font-bold uppercase tracking-wider border border-[rgba(255,107,53,0.2)] bg-[rgba(255,107,53,0.05)] text-[#FF6B35] hover:bg-[#FF6B35] hover:text-white hover:shadow-lg hover:shadow-[#FF6B35]/20 transition-all duration-300 active:scale-95"
                    style={{fontFamily: 'DM Sans, sans-serif'}}
                  >
                    {s}
@@ -197,8 +197,8 @@ export default function ChatbotIcon() {
           )}
 
           {/* Input Area - DARK PREMIUM */}
-          <div className="p-6 bg-[#111111]/90 backdrop-blur-3xl border-t border-[#2A2520]">
-            <div className="flex items-center gap-3 bg-[#1C1C1C] border border-[#2A2520] rounded-2xl px-4 py-2 focus-within:border-[rgba(255,107,53,0.5)] focus-within:ring-2 focus-within:ring-[rgba(255,107,53,0.1)] transition-all shadow-inner relative">
+          <div className="p-4 sm:p-6 bg-[#111111]/90 backdrop-blur-3xl border-t border-[#2A2520]">
+            <div className="flex items-center gap-2 sm:gap-3 bg-[#1C1C1C] border border-[#2A2520] rounded-[14px] sm:rounded-2xl px-3 py-1.5 sm:px-4 sm:py-2 focus-within:border-[rgba(255,107,53,0.5)] focus-within:ring-2 focus-within:ring-[rgba(255,107,53,0.1)] transition-all shadow-inner relative">
               <textarea
                 rows="1"
                 value={input}
@@ -211,13 +211,13 @@ export default function ChatbotIcon() {
               <button
                 onClick={() => handleSend(input)}
                 disabled={!input.trim() || isTyping}
-                className={`p-3 rounded-xl transition-all duration-300 border-none cursor-pointer ${
+                className={`p-2 sm:p-3 rounded-[10px] sm:rounded-xl transition-all duration-300 border-none cursor-pointer flex-shrink-0 ${
                   !input.trim() || isTyping 
                     ? 'bg-[#2A2520] text-[#5C5550]' 
                     : 'bg-[#FF6B35] text-white hover:bg-[#E8A430] hover:scale-105 active:scale-95 shadow-[0_4px_15px_rgba(255,107,53,0.4)]'
                 }`}
               >
-                <Send size={20} className={input.trim() ? 'rotate-[-10deg]' : ''} />
+                <Send className={`${input.trim() ? 'rotate-[-10deg]' : ''} w-4 h-4 sm:w-5 sm:h-5`} />
               </button>
             </div>
             <p className="text-[9px] text-center text-[#5C5550] mt-4 font-bold uppercase tracking-[0.2em]" style={{fontFamily: 'JetBrains Mono, monospace'}}>POWERED BY PLACIFY NEURAL NETWORK</p>
