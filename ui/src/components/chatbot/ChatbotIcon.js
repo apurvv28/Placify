@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Bot, Send, User, ChevronDown, Sparkles } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
@@ -11,6 +11,9 @@ const SUGGESTIONS = [
 
 export default function ChatbotIcon() {
   const [isOpen, setIsOpen] = useState(false);
+  const [launcherPosition, setLauncherPosition] = useState(null);
+  const [dragArmed, setDragArmed] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const [messages, setMessages] = useState([
     { 
       id: 1, 
@@ -22,16 +25,129 @@ export default function ChatbotIcon() {
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
+  const launcherRef = useRef(null);
+  const clickTimeoutRef = useRef(null);
+  const dragArmTimeoutRef = useRef(null);
+  const longPressTimerRef = useRef(null);
+  const dragOffsetRef = useRef({ x: 0, y: 0 });
+  const dragSizeRef = useRef({ width: 48, height: 48 });
+  const dragPointerTypeRef = useRef('mouse');
+  const longPressTriggeredRef = useRef(false);
+  const suppressNextClickRef = useRef(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
+
+  const clearTimers = useCallback(() => {
+    if (clickTimeoutRef.current) {
+      clearTimeout(clickTimeoutRef.current);
+      clickTimeoutRef.current = null;
+    }
+    if (dragArmTimeoutRef.current) {
+      clearTimeout(dragArmTimeoutRef.current);
+      dragArmTimeoutRef.current = null;
+    }
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+  }, []);
+
+  const clampPosition = useCallback((x, y) => {
+    const margin = 8;
+    const maxX = Math.max(margin, window.innerWidth - dragSizeRef.current.width - margin);
+    const maxY = Math.max(margin, window.innerHeight - dragSizeRef.current.height - margin);
+    return {
+      x: Math.min(Math.max(x, margin), maxX),
+      y: Math.min(Math.max(y, margin), maxY),
+    };
+  }, []);
+
+  const startDrag = (clientX, clientY, pointerType = 'mouse') => {
+    if (!launcherRef.current) return;
+
+    const rect = launcherRef.current.getBoundingClientRect();
+    dragSizeRef.current = { width: rect.width, height: rect.height };
+    dragOffsetRef.current = { x: clientX - rect.left, y: clientY - rect.top };
+    dragPointerTypeRef.current = pointerType;
+
+    setLauncherPosition({ x: rect.left, y: rect.top });
+    setIsDragging(true);
+  };
+
+  const updateDragPosition = useCallback((clientX, clientY) => {
+    const rawX = clientX - dragOffsetRef.current.x;
+    const rawY = clientY - dragOffsetRef.current.y;
+    setLauncherPosition(clampPosition(rawX, rawY));
+  }, [clampPosition]);
+
+  const stopDrag = useCallback(() => {
+    if (isDragging) {
+      suppressNextClickRef.current = true;
+    }
+    setIsDragging(false);
+    setDragArmed(false);
+    longPressTriggeredRef.current = false;
+  }, [isDragging]);
 
   useEffect(() => {
     if (isOpen) {
       scrollToBottom();
     }
   }, [messages, isTyping, isOpen]);
+
+  useEffect(() => {
+    return () => clearTimers();
+  }, [clearTimers]);
+
+  useEffect(() => {
+    if (!isDragging || dragPointerTypeRef.current !== 'mouse') return undefined;
+
+    const onMouseMove = (event) => {
+      updateDragPosition(event.clientX, event.clientY);
+    };
+
+    const onMouseUp = () => {
+      stopDrag();
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+  }, [isDragging, stopDrag, updateDragPosition]);
+
+  useEffect(() => {
+    const onTouchMove = (event) => {
+      if (!isDragging || dragPointerTypeRef.current !== 'touch') return;
+      const touch = event.touches?.[0];
+      if (!touch) return;
+      event.preventDefault();
+      updateDragPosition(touch.clientX, touch.clientY);
+    };
+
+    const onTouchEnd = () => {
+      if (!isDragging || dragPointerTypeRef.current !== 'touch') {
+        longPressTriggeredRef.current = false;
+        return;
+      }
+      stopDrag();
+    };
+
+    window.addEventListener('touchmove', onTouchMove, { passive: false });
+    window.addEventListener('touchend', onTouchEnd);
+    window.addEventListener('touchcancel', onTouchEnd);
+
+    return () => {
+      window.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('touchend', onTouchEnd);
+      window.removeEventListener('touchcancel', onTouchEnd);
+    };
+  }, [isDragging, stopDrag, updateDragPosition]);
 
   const handleSend = async (text) => {
     if (!text.trim() || isTyping) return;
@@ -86,19 +202,104 @@ export default function ChatbotIcon() {
     return new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
+  const handleLauncherClick = () => {
+    if (suppressNextClickRef.current) {
+      suppressNextClickRef.current = false;
+      return;
+    }
+
+    if (isDragging || dragArmed) {
+      return;
+    }
+
+    if (clickTimeoutRef.current) {
+      clearTimeout(clickTimeoutRef.current);
+    }
+
+    clickTimeoutRef.current = setTimeout(() => {
+      setIsOpen(true);
+    }, 220);
+  };
+
+  const handleLauncherDoubleClick = (event) => {
+    event.preventDefault();
+
+    if (clickTimeoutRef.current) {
+      clearTimeout(clickTimeoutRef.current);
+      clickTimeoutRef.current = null;
+    }
+
+    setDragArmed(true);
+
+    if (dragArmTimeoutRef.current) {
+      clearTimeout(dragArmTimeoutRef.current);
+    }
+
+    dragArmTimeoutRef.current = setTimeout(() => {
+      setDragArmed(false);
+    }, 4000);
+  };
+
+  const handleLauncherMouseDown = (event) => {
+    if (event.button !== 0 || !dragArmed) return;
+    event.preventDefault();
+    startDrag(event.clientX, event.clientY, 'mouse');
+  };
+
+  const handleLauncherTouchStart = (event) => {
+    const touch = event.touches?.[0];
+    if (!touch) return;
+
+    longPressTriggeredRef.current = false;
+
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+    }
+
+    longPressTimerRef.current = setTimeout(() => {
+      longPressTriggeredRef.current = true;
+      startDrag(touch.clientX, touch.clientY, 'touch');
+    }, 320);
+  };
+
+  const handleLauncherTouchEnd = () => {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+
+    if (longPressTriggeredRef.current && !isDragging) {
+      suppressNextClickRef.current = true;
+      longPressTriggeredRef.current = false;
+    }
+  };
+
+  const launcherContainerStyle = !isOpen && launcherPosition
+    ? { left: `${launcherPosition.x}px`, top: `${launcherPosition.y}px`, right: 'auto', bottom: 'auto' }
+    : undefined;
+
   return (
-    <div className="fixed bottom-4 right-4 sm:bottom-10 sm:right-10 z-[100] font-sans">
+    <div className="fixed bottom-14 right-3 sm:bottom-16 sm:right-6 z-[100] font-sans" style={launcherContainerStyle}>
       {/* Bot Icon Button - SLEEK RINGS */}
       {!isOpen && (
         <button
-          onClick={() => setIsOpen(true)}
-          className="relative group p-4 sm:p-5 rounded-[20px] sm:rounded-[24px] bg-gradient-to-br from-[#FF6B35] to-[#FF3D00] text-white shadow-2xl shadow-[#FF6B35]/40 hover:shadow-[#FF6B35]/60 hover:scale-110 active:scale-95 transition-all duration-500 group animate-pulse"
+          ref={launcherRef}
+          onClick={handleLauncherClick}
+          onDoubleClick={handleLauncherDoubleClick}
+          onMouseDown={handleLauncherMouseDown}
+          onTouchStart={handleLauncherTouchStart}
+          onTouchEnd={handleLauncherTouchEnd}
+          onTouchCancel={handleLauncherTouchEnd}
+          className={`relative group p-2.5 sm:p-3 rounded-[14px] sm:rounded-[16px] bg-gradient-to-br from-[#FF6B35] to-[#FF3D00] text-white shadow-xl shadow-[#FF6B35]/35 hover:shadow-[#FF6B35]/55 transition-all duration-300 ${
+            isDragging ? 'scale-95 cursor-grabbing' : dragArmed ? 'cursor-grab ring-2 ring-orange-300/50' : 'hover:scale-105 active:scale-95'
+          }`}
+          style={{ touchAction: isDragging ? 'none' : 'auto' }}
         >
-          <div className="absolute inset-0 rounded-[20px] sm:rounded-[24px] border-2 border-white/20 animate-ping opacity-20 group-hover:opacity-40" />
-          <Sparkles className="absolute -top-2 -right-2 w-4 h-4 sm:w-5 sm:h-5 text-[#E8A430] animate-pulse drop-shadow-lg" />
-          <Bot className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
+          <div className="absolute inset-0 rounded-[14px] sm:rounded-[16px] border border-white/20 opacity-20 group-hover:opacity-35 transition-opacity" />
+          <Sparkles className="absolute -top-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 text-[#E8A430] animate-pulse drop-shadow-lg" />
+          <Bot className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
           {/* Tooltip */}
-          <span className="absolute right-full mr-6 top-1/2 -translate-y-1/2 px-4 py-2 rounded-2xl bg-[#111111] border border-white/10 text-[11px] font-black uppercase tracking-[0.15em] text-[#FF6B35] whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-300 transform translate-x-4 group-hover:translate-x-0 shadow-2xl">
+          <span className="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-1.5 rounded-xl bg-[#111111] border border-white/10 text-[10px] font-black uppercase tracking-[0.12em] text-[#FF6B35] whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0 shadow-xl">
             CONSULT PLACIFY AI
           </span>
         </button>

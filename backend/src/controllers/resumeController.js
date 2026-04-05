@@ -6,6 +6,99 @@ const { isS3ResumeStorageEnabled, uploadResumeBuffer } = require('../config/s3')
 const resumeRepo = new ResumeRepository();
 const userRepo = new UserRepository();
 
+const GROQ_CHAT_URL = 'https://api.groq.com/openai/v1/chat/completions';
+const GROQ_ATS_MODEL = process.env.GROQ_ATS_MODEL || 'llama-3.3-70b-versatile';
+
+const buildSummaryPrompt = ({ personalInfo, currentSummary, experience, skills }) => {
+  const skillText = Array.isArray(skills)
+    ? skills.filter(Boolean).slice(0, 12).join(', ')
+    : '';
+
+  const experienceText = Array.isArray(experience)
+    ? experience
+        .filter((item) => item && (item.role || item.company || item.description))
+        .slice(0, 4)
+        .map((item) => {
+          const role = item.role || 'Role';
+          const company = item.company || 'Company';
+          const desc = item.description || '';
+          return `${role} at ${company}: ${desc}`.trim();
+        })
+        .join('\n- ')
+    : '';
+
+  return [
+    'Generate a professional resume summary in 3-4 lines.',
+    'Keep tone professional, concise, and ATS-friendly.',
+    'Use measurable impact language when possible.',
+    'Return ONLY plain text summary (no markdown, no bullets, no headings).',
+    '',
+    `Candidate Name: ${personalInfo?.name || ''}`,
+    `Current Summary: ${currentSummary || ''}`,
+    `Top Skills: ${skillText || '[not provided]'}`,
+    `Experience Highlights:\n- ${experienceText || '[not provided]'}`,
+  ].join('\n');
+};
+
+const suggestProfessionalSummary = async (req, res) => {
+  try {
+    const apiKey = process.env.GROQ_API_KEY;
+    if (!apiKey || apiKey === 'your_groq_api_key_here') {
+      return res.status(500).json({ message: 'GROQ_API_KEY is not configured on the server.' });
+    }
+
+    const { personalInfo = {}, professionalSummary = '', experience = [], skills = [] } = req.body || {};
+
+    const payload = {
+      model: GROQ_ATS_MODEL,
+      temperature: 0.2,
+      max_tokens: 300,
+      messages: [
+        {
+          role: 'system',
+          content:
+            'You are a resume writing assistant. Write concise, ATS-friendly professional summaries tailored to candidate data.',
+        },
+        {
+          role: 'user',
+          content: buildSummaryPrompt({
+            personalInfo,
+            currentSummary: professionalSummary,
+            experience,
+            skills,
+          }),
+        },
+      ],
+    };
+
+    const response = await fetch(GROQ_CHAT_URL, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Groq API returned ${response.status}: ${errorText}`);
+    }
+
+    const data = await response.json();
+    const suggestion = String(data?.choices?.[0]?.message?.content || '').trim();
+
+    if (!suggestion) {
+      return res.status(500).json({ message: 'AI did not return a summary suggestion.' });
+    }
+
+    return res.status(200).json({ suggestion });
+  } catch (error) {
+    console.error('Professional summary suggestion error:', error);
+    return res.status(500).json({ message: 'Failed to generate professional summary suggestion.' });
+  }
+};
+
 
 exports.getResume = async (req, res, next) => {
     try {
@@ -204,6 +297,7 @@ module.exports = {
   getResume: exports.getResume,
   saveResume: exports.saveResume,
   clearResume: exports.clearResume,
+  suggestProfessionalSummary,
   createResume,
   getResumes,
   viewResume,

@@ -38,6 +38,16 @@ const NAV_ITEMS = [
     ),
   },
   {
+    id: 'interviewiq', label: 'InterviewIQ', route: '/interviewiq',
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 3l7 4v10l-7 4-7-4V7l7-4z" />
+        <path d="M9 12h6" />
+        <path d="M12 9v6" />
+      </svg>
+    ),
+  },
+  {
     id: 'chat', label: 'Chat',
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -63,8 +73,18 @@ const NAV_ITEMS = [
   },
 ];
 
-export default function Sidebar({ collapsed, setCollapsed, activeSection, setActiveSection, onLogout, userName, mobileOpen, setMobileOpen }) {
-  const handleNavClick = (id) => { setActiveSection(id); setMobileOpen(false); };
+export default function Sidebar({ collapsed, setCollapsed, activeSection, setActiveSection, onLogout, userName, mobileOpen, setMobileOpen, onNavRoute, resolveNavRoute }) {
+  const handleNavClick = (item) => {
+    const resolvedRoute = typeof resolveNavRoute === 'function' ? resolveNavRoute(item) : item.route;
+
+    if (resolvedRoute && typeof onNavRoute === 'function') {
+      onNavRoute(resolvedRoute);
+      setMobileOpen(false);
+      return;
+    }
+    setActiveSection(item.id);
+    setMobileOpen(false);
+  };
 
   const sidebarContent = (
     <div className="flex flex-col h-full">
@@ -112,7 +132,7 @@ export default function Sidebar({ collapsed, setCollapsed, activeSection, setAct
             <button
               key={item.id}
               type="button"
-              onClick={() => handleNavClick(item.id)}
+              onClick={() => handleNavClick(item)}
               title={collapsed ? item.label : undefined}
               className="group relative w-full flex items-center gap-3 rounded-l-lg transition-all duration-200 border-none cursor-pointer"
               style={{

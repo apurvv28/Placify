@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import DashboardHome from './sections/DashboardHome';
 import CommunitySection from './sections/CommunitySection';
@@ -12,6 +12,7 @@ import ChatbotIcon from '../chatbot/ChatbotIcon';
 
 export default function DashboardPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const token = localStorage.getItem('placifyToken');
   const [user, setUser] = useState(() => {
     try {
@@ -49,6 +50,16 @@ export default function DashboardPage() {
     };
     fetchCurrentUser();
   }, [navigate, token]);
+
+  useEffect(() => {
+    const section = new URLSearchParams(location.search).get('section');
+    const allowedSections = new Set(['home', 'community', 'ats-analyzer', 'resume-builder', 'chat', 'placed-resumes', 'profile']);
+    if (section && allowedSections.has(section)) {
+      setActiveSection(section);
+    } else if (!section) {
+      setActiveSection('home');
+    }
+  }, [location.search]);
 
   if (!token) return <Navigate to="/auth" replace />;
 
@@ -190,11 +201,16 @@ export default function DashboardPage() {
         activeSection={activeSection} setActiveSection={setActiveSection}
         onLogout={handleLogout} userName={user?.name}
         mobileOpen={mobileOpen} setMobileOpen={setMobileOpen}
+        onNavRoute={(route) => navigate(route)}
       />
-      <main className="flex-1 overflow-y-auto custom-scrollbar">
-        <div className="p-5 sm:p-6 lg:p-8 pl-14 lg:pl-6">
-          {renderSection()}
-        </div>
+      <main className={`flex-1 ${activeSection === 'chat' ? 'overflow-hidden' : 'overflow-y-auto'} custom-scrollbar`}>
+        {activeSection === 'chat' ? (
+          renderSection()
+        ) : (
+          <div className="p-5 sm:p-6 lg:p-8 pl-14 lg:pl-6">
+            {renderSection()}
+          </div>
+        )}
       </main>
       <ChatbotIcon />
     </div>

@@ -194,6 +194,86 @@ const CATEGORY_META = {
   portfolio: { icon: '🌐', label: 'Portfolio / Other' },
 };
 
+const ATS_CRITERIA = [
+  {
+    title: 'Section Completeness',
+    weight: '20%',
+    icon: '📄',
+    rule: 'Header, summary, experience, education, and skills should be clearly present.',
+  },
+  {
+    title: 'Keyword Relevance',
+    weight: '35%',
+    icon: '🎯',
+    rule: 'Role-specific keywords should match job description terms with strong coverage.',
+  },
+  {
+    title: 'Formatting Hygiene',
+    weight: '15%',
+    icon: '🧩',
+    rule: 'ATS-friendly layout, clean headings, and readable structure improve parsing quality.',
+  },
+  {
+    title: 'Content Impact',
+    weight: '15%',
+    icon: '📈',
+    rule: 'Action verbs, measurable outcomes, and concise bullet points increase score quality.',
+  },
+  {
+    title: 'Link Verification',
+    weight: '15%',
+    icon: '🔗',
+    rule: 'GitHub, LinkedIn, and portfolio links are validated for reliability and accessibility.',
+  },
+];
+
+function AnalysisCriteriaPanel() {
+  return (
+    <div style={panelStyle} className="h-full">
+      <div className="flex items-center justify-between gap-3 mb-3">
+        <h2 className="font-semibold text-base sm:text-lg" style={{ color: '#F5F0EB', fontFamily: 'Syne, sans-serif' }}>
+          ATS Analysis Criteria
+        </h2>
+        <span
+          className="px-2 py-1 rounded-sm text-[10px] uppercase tracking-wider border"
+          style={{ backgroundColor: 'rgba(255,107,53,0.10)', borderColor: 'rgba(255,107,53,0.30)', color: '#FF6B35', fontFamily: 'JetBrains Mono, monospace' }}
+        >
+          Weighted Rubric
+        </span>
+      </div>
+
+      <p className="text-xs sm:text-sm mb-4 leading-relaxed" style={{ color: '#A89E94', fontFamily: 'DM Sans, sans-serif' }}>
+        Scores are calculated from multiple ATS signals. Improve low-weight areas first for faster score gains.
+      </p>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {ATS_CRITERIA.map((criterion) => (
+          <div
+            key={criterion.title}
+            className="rounded-lg p-3 sm:p-4"
+            style={{ backgroundColor: 'rgba(0,0,0,0.20)', border: '1px solid #2A2520' }}
+          >
+            <div className="flex items-center justify-between gap-2 mb-1.5">
+              <p className="text-sm font-semibold" style={{ color: '#F5F0EB', fontFamily: 'DM Sans, sans-serif' }}>
+                {criterion.icon} {criterion.title}
+              </p>
+              <span
+                className="px-2 py-0.5 rounded-sm text-[10px] uppercase tracking-wide border"
+                style={{ backgroundColor: 'rgba(232,164,48,0.10)', borderColor: 'rgba(232,164,48,0.30)', color: '#E8A430', fontFamily: 'JetBrains Mono, monospace' }}
+              >
+                {criterion.weight}
+              </span>
+            </div>
+            <p className="text-xs leading-relaxed" style={{ color: '#5C5550', fontFamily: 'DM Sans, sans-serif' }}>
+              {criterion.rule}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function StatusChip({ status }) {
   const chips = {
     live:         { bg: 'rgba(232,164,48,0.12)', border: 'rgba(232,164,48,0.3)', text: '#E8A430', label: '✅ Live' },
@@ -282,15 +362,32 @@ function UploadPanel({ onAnalyze, loading, error }) {
 
   return (
     <div className="space-y-5">
-      <h1 className="text-2xl font-bold border-l-2 pl-3" style={{ fontFamily: 'Syne, sans-serif', color: '#F5F0EB', borderLeftColor: '#FF6B35' }}>ATS Resume Analyzer</h1>
-      <p className="text-sm" style={{ color: '#A89E94', fontFamily: 'DM Sans, sans-serif' }}>Upload your resume and get an instant AI-powered ATS compatibility report.</p>
+      <div className="rounded-xl p-4 sm:p-5" style={{ backgroundColor: '#111111', border: '1px solid #2A2520' }}>
+        <h1 className="text-xl sm:text-2xl font-bold border-l-2 pl-3" style={{ fontFamily: 'Syne, sans-serif', color: '#F5F0EB', borderLeftColor: '#FF6B35' }}>
+          ATS Resume Analyzer
+        </h1>
+        <p className="text-xs sm:text-sm mt-2" style={{ color: '#A89E94', fontFamily: 'DM Sans, sans-serif' }}>
+          Upload your resume and get an AI-powered ATS report with section health, keyword coverage, formatting warnings, and prioritized improvements.
+        </p>
+      </div>
 
-      <form onSubmit={(e) => { e.preventDefault(); if (!file) { alert('Please select a resume file first.'); return; } onAnalyze(file, jd); }} className="space-y-4">
+      <div className="grid grid-cols-1 xl:grid-cols-5 gap-4 sm:gap-5">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (!file) {
+              alert('Please select a resume file first.');
+              return;
+            }
+            onAnalyze(file, jd);
+          }}
+          className="space-y-4 xl:col-span-3"
+        >
         {/* Drop zone */}
         <div
           onClick={() => inputRef.current?.click()}
           onDrop={onDrop} onDragOver={onDragOver} onDragLeave={() => setDragging(false)}
-          className="rounded-xl border-2 border-dashed cursor-pointer p-10 text-center transition-all duration-200"
+          className="rounded-xl border-2 border-dashed cursor-pointer p-6 sm:p-10 text-center transition-all duration-200"
           style={{
             borderColor: dragging ? '#FF6B35' : file ? 'rgba(232,164,48,0.4)' : '#2A2520',
             backgroundColor: dragging ? 'rgba(255,107,53,0.06)' : file ? 'rgba(232,164,48,0.03)' : '#111111',
@@ -342,7 +439,12 @@ function UploadPanel({ onAnalyze, loading, error }) {
         >
           {loading ? (<><svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" /></svg>Analyzing with AI…</>) : 'Analyze Resume'}
         </button>
-      </form>
+        </form>
+
+        <div className="xl:col-span-2">
+          <AnalysisCriteriaPanel />
+        </div>
+      </div>
     </div>
   );
 }

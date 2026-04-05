@@ -6,6 +6,9 @@ import DashboardPage from './components/dashboard/DashboardPage';
 import Features from './components/pages/Features';
 import Testimonials from './components/pages/Testimonials';
 import Contact from './components/pages/Contact';
+import InterviewIQDashboardPage from './components/interviewiq/InterviewIQDashboardPage';
+import InterviewIQDeckSessionPage from './components/interviewiq/InterviewIQDeckSessionPage';
+import InterviewIQHistoryPage from './components/interviewiq/InterviewIQHistoryPage';
 import { SocketProvider } from './context/SocketContext';
 import logo from './logo.png';
 
@@ -34,6 +37,9 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/auth" element={<AuthFlipPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/interviewiq" element={<InterviewIQDashboardPage />} />
+          <Route path="/interviewiq/deck/:deckNumber" element={<InterviewIQDeckSessionPage />} />
+          <Route path="/interviewiq/history" element={<InterviewIQHistoryPage />} />
         </Routes>
       </SocketProvider>
     </BrowserRouter>

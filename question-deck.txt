@@ -1,0 +1,551 @@
+# InterviewIQ - 300 Question Bank for Indian Placements
+
+## Question Distribution
+- **Behavioral Questions**: 210 (70%)
+- **Logical Reasoning Questions**: 90 (30%)
+
+---
+
+## BEHAVIORAL QUESTIONS (210 questions)
+
+### Category: Leadership (30 questions)
+
+**Easy (10 questions)**
+
+1. Tell me about a time when you led a team project in college.
+2. Describe a situation where you took initiative when no one else did.
+3. How do you motivate team members who are not performing well?
+4. Share an example of setting goals for your team and achieving them.
+5. What does leadership mean to you in a professional context?
+6. Describe a time you delegated tasks effectively.
+7. How do you handle situations when your team is falling behind schedule?
+8. Tell me about a leadership role you enjoyed the most.
+9. What qualities make a good leader according to you?
+10. Describe a time when you had to make a difficult decision as a leader.
+
+**Medium (10 questions)**
+
+11. Tell me about a time your team faced conflict and how you resolved it as a leader.
+12. Describe a situation where you had to lead without formal authority.
+13. How did you handle a team member who disagreed with your leadership approach?
+14. Share an example of mentoring a junior team member to improve their performance.
+15. Describe when you had to adapt your leadership style for different team members.
+16. Tell me about a time your team missed a deadline despite your leadership.
+17. How did you handle recognition for a project - taking credit vs sharing?
+18. Describe a situation where you turned around a demotivated team.
+19. Tell me about implementing a new process that improved team efficiency.
+20. How did you handle a team member who wanted to quit during an important project?
+
+**Hard (10 questions)**
+
+21. Describe a time you led through organizational change or crisis.
+22. Tell me about a failed leadership attempt and what you learned.
+23. How did you handle a situation where upper management disagreed with your team's approach?
+24. Describe leading a diverse team with significant cultural or generational differences.
+25. Tell me about a time you had to fire or strongly discipline a team member.
+26. How did you handle being blamed for a team failure that wasn't your fault?
+27. Describe leading a remote/hybrid team through a complex project.
+28. Tell me about balancing multiple stakeholders with conflicting priorities.
+29. How did you rebuild trust after a major team failure?
+30. Describe a situation where you had to make an unpopular but necessary decision.
+
+---
+
+### Category: Conflict Resolution (25 questions)
+
+**Easy (8 questions)**
+
+31. Tell me about a disagreement with a classmate and how you resolved it.
+32. How do you handle situations when someone interrupts you repeatedly?
+33. Describe a time you apologized to resolve a conflict.
+34. What do you do when two friends in your team are fighting?
+35. Tell me about a misunderstanding that you cleared up.
+36. How do you stay calm during an argument?
+37. Describe when you agreed to disagree with someone.
+38. What's your approach to handling criticism from peers?
+
+**Medium (9 questions)**
+
+39. Tell me about a conflict with a senior/manager and how you resolved it.
+40. Describe a situation where you had to mediate between two team members.
+41. How did you handle a client who was angry about deliverables?
+42. Tell me about a time you disagreed with a project requirement but had to implement it.
+43. Describe when you received unfair feedback and how you responded.
+44. How did you resolve a resource allocation conflict within your team?
+45. Tell me about a time you had to confront a colleague about their behavior.
+46. Describe a situation where you chose to escalate a conflict vs resolve it yourself.
+47. How did you handle a passive-aggressive team member?
+
+**Hard (8 questions)**
+
+48. Describe a high-stakes conflict that could have derailed a project.
+49. Tell me about a time you had to resolve conflict between your team and another department.
+50. How did you handle a situation where a colleague took credit for your work?
+51. Describe resolving a conflict involving ethical concerns.
+52. Tell me about a time you had to work with someone who previously wronged you.
+53. How did you handle a conflict that kept recurring despite multiple attempts to resolve?
+54. Describe a situation where you had to choose between loyalty and doing the right thing.
+55. Tell me about resolving a conflict when both parties were equally at fault.
+
+---
+
+### Category: Teamwork (30 questions)
+
+**Easy (10 questions)**
+
+56. Tell me about a successful team project you were part of.
+57. How do you ensure everyone contributes equally in a team?
+58. Describe a time you helped a struggling team member.
+59. What role do you usually take in team settings?
+60. Tell me about a time you shared credit with your team.
+61. How do you communicate with teammates who prefer different communication styles?
+62. Describe a team experience you really enjoyed.
+63. What do you do when your teammate is absent and work is piling up?
+64. Tell me about learning something new from a teammate.
+65. How do you celebrate team achievements?
+
+**Medium (10 questions)**
+
+66. Describe a time your team had to work under extreme time pressure.
+67. Tell me about a team project where roles were unclear and how you handled it.
+68. How did you handle a teammate who wasn't pulling their weight?
+69. Describe a time you had to collaborate with people from different departments.
+70. Tell me about a team failure and what you learned from it.
+71. How did you integrate a new member into an existing high-performing team?
+72. Describe a situation where your team had to pivot halfway through a project.
+73. Tell me about balancing individual responsibilities with team goals.
+74. How did you handle receiving constructive criticism from a teammate?
+75. Describe a time you volunteered for extra work to help your team meet a deadline.
+
+**Hard (10 questions)**
+
+76. Tell me about building a high-performing team from scratch.
+77. Describe a time your team was dysfunctional and how you helped fix it.
+78. How did you handle being the only one who spotted a critical flaw in team work?
+79. Tell me about a cross-functional project with competing priorities.
+80. Describe a situation where team morale was extremely low and what you did.
+81. How did you handle a teammate who was actively sabotaging the project?
+82. Tell me about leading knowledge sharing across a large team.
+83. Describe a time you had to rebuild trust after a team member's major mistake.
+84. How did you handle a team that had too many leaders and not enough workers?
+85. Tell me about a global team project across different time zones.
+
+---
+
+### Category: Adaptability (30 questions)
+
+**Easy (10 questions)**
+
+86. Tell me about a time your plans changed unexpectedly.
+87. How do you handle last-minute changes to deadlines?
+88. Describe a situation where you had to learn a new tool quickly.
+89. What do you do when you receive new information that contradicts your approach?
+90. Tell me about switching between multiple tasks effectively.
+91. How do you adjust when your preferred method isn't working?
+92. Describe a time you had to work in an unfamiliar environment.
+93. What's your approach to handling sudden increase in workload?
+94. Tell me about a time you had to change your communication style for different audiences.
+95. How do you stay productive when priorities keep shifting?
+
+**Medium (10 questions)**
+
+96. Describe a time a project requirement changed significantly mid-way.
+97. Tell me about adapting to a new manager with different working style.
+98. How did you handle working on a legacy codebase with no documentation?
+99. Describe a situation where your technical solution was rejected and you had to pivot.
+100. Tell me about adapting to a completely new role or responsibility.
+101. How did you handle a production outage that required immediate response?
+102. Describe a time you had to work with outdated technology due to constraints.
+103. Tell me about adjusting your career goals based on market changes.
+104. How did you adapt when your key team member left during a critical phase?
+105. Describe a situation where you had to learn from failure and change your approach.
+
+**Hard (10 questions)**
+
+106. Tell me about adapting during a company-wide crisis or restructuring.
+107. Describe a time you had to unlearn a deeply held belief or practice.
+108. How did you adapt to working through the COVID-19 pandemic?
+109. Tell me about pivoting your entire project based on customer feedback.
+110. Describe adapting to a new industry with completely different norms.
+111. How did you handle being moved to a team working on a completely different tech stack?
+112. Tell me about a time you had to work under a leader whose style you strongly disagreed with.
+113. Describe adapting to a role that was significantly different from what was promised.
+114. How did you handle working in a highly ambiguous startup environment?
+115. Tell me about adapting your 6-month plan after 1 week due to major changes.
+
+---
+
+### Category: Problem Solving (30 questions)
+
+**Easy (10 questions)**
+
+116. Tell me about a technical problem you solved in college.
+117. How do you approach debugging an issue you've never seen before?
+118. Describe a time you found a creative solution to a common problem.
+119. What's your process when you get stuck on a problem?
+120. Tell me about a time you helped someone else solve their problem.
+121. How do you prioritize when multiple problems need solving?
+122. Describe a simple problem you overcomplicated initially.
+123. Tell me about using Google/Stack Overflow effectively to solve an issue.
+124. What do you do when you don't know the answer to a problem?
+125. Describe a time you solved a problem by breaking it into smaller parts.
+
+**Medium (10 questions)**
+
+126. Tell me about a complex bug that took days to solve.
+127. Describe a time your initial solution didn't work and how you pivoted.
+128. How did you solve a problem with incomplete requirements?
+129. Tell me about optimizing an inefficient process or code.
+130. Describe a time you had to solve a problem under tight constraints.
+131. How did you troubleshoot a problem that only occurred in production?
+132. Tell me about solving a problem that required learning a new technology.
+133. Describe a time you prevented a potential problem before it occurred.
+134. How did you handle a problem that everyone else had given up on?
+135. Tell me about solving a problem by collaborating across teams.
+
+**Hard (10 questions)**
+
+136. Describe a critical system failure you helped resolve.
+137. Tell me about solving a problem with no clear right answer.
+138. How did you troubleshoot a problem that was caused by multiple factors?
+139. Describe a time you had to solve a problem affecting customer revenue.
+140. Tell me about finding the root cause of a recurring issue everyone had accepted.
+141. How did you solve a problem that required changing organizational processes?
+142. Describe a time your solution created new problems and how you handled it.
+143. Tell me about solving a security vulnerability in legacy code.
+144. How did you approach a problem with conflicting technical and business requirements?
+145. Describe a time you had to solve a problem without any documentation or senior help.
+
+---
+
+### Category: Pressure & Deadlines (20 questions)
+
+**Easy (7 questions)**
+
+146. Tell me about a time you met a tight deadline.
+147. How do you stay calm under pressure?
+148. Describe a situation where you had to work overtime to finish a task.
+149. What do you do when you realize you might miss a deadline?
+150. Tell me about prioritizing tasks when everything seems urgent.
+151. How do you handle multiple deadlines at once?
+152. Describe a time you successfully worked under pressure.
+
+**Medium (7 questions)**
+
+153. Tell me about a time you missed a deadline and how you handled it.
+154. How did you handle a high-pressure situation with a client watching?
+155. Describe a time you had to deliver bad news about delays to stakeholders.
+156. Tell me about working on a critical release with no room for error.
+157. How did you manage pressure when your manager was micromanaging?
+158. Describe a situation where you had to make a quick decision with incomplete information.
+159. Tell me about balancing quality and speed under pressure.
+
+**Hard (6 questions)**
+
+160. Describe a life-critical or business-critical pressure situation.
+161. Tell me about working through burnout while meeting deadlines.
+162. How did you handle pressure when your entire team was counting on you alone?
+163. Describe a time you had to perform under pressure with inadequate resources.
+164. Tell me about a situation where panic was spreading in the team and you stayed calm.
+165. How did you handle back-to-back crises without recovery time?
+
+---
+
+### Category: Failure & Learning (20 questions)
+
+**Easy (7 questions)**
+
+166. Tell me about a time you made a mistake and what you learned.
+167. Describe a project that didn't go as planned.
+168. What's the most important lesson you learned from a failure?
+169. Tell me about a time you misunderstood requirements.
+170. How do you bounce back after making an error?
+171. Describe a time you asked for help after failing.
+172. What did you learn from your biggest technical mistake?
+
+**Medium (7 questions)**
+
+173. Tell me about a time your team failed despite your best efforts.
+174. Describe a situation where you took responsibility for a failure that wasn't yours.
+175. How did you handle a failed interview or assessment?
+176. Tell me about a time your solution was rejected by the client.
+177. Describe a failure that changed how you work permanently.
+178. How did you recover from a mistake that affected others?
+179. Tell me about a time you failed because you didn't ask enough questions.
+
+**Hard (6 questions)**
+
+180. Describe a career setback and how you overcame it.
+181. Tell me about a failure that made you consider quitting your career.
+182. How did you handle a project failure that cost the company significantly?
+183. Describe a time you failed despite following all best practices.
+184. Tell me about taking ownership of a failure that leadership blamed on someone else.
+185. How did you rebuild your confidence after a major failure?
+
+---
+
+### Category: Communication (25 questions)
+
+**Easy (8 questions)**
+
+186. Tell me about a time you explained a technical concept to a non-technical person.
+187. How do you ensure your message is understood correctly?
+188. Describe a time your good communication prevented a problem.
+189. What do you do when someone misunderstands you?
+190. Tell me about a presentation you gave that went well.
+191. How do you ask clarifying questions effectively?
+192. Describe a time you had to communicate bad news.
+193. What's your approach to written communication like emails or documentation?
+
+**Medium (9 questions)**
+
+194. Tell me about a time you had to persuade someone to see your point of view.
+195. How did you handle a miscommunication that caused a project delay?
+196. Describe a situation where you had to communicate with an angry stakeholder.
+197. Tell me about tailoring your communication for different audiences.
+198. How do you handle being interrupted or talked over in meetings?
+199. Describe a time you had to give difficult feedback to a peer.
+200. Tell me about a time your communication style had to change for remote work.
+201. How did you handle a situation where no one was listening to your ideas?
+202. Describe a time you successfully negotiated something important.
+
+**Hard (8 questions)**
+
+203. Tell me about communicating during a company crisis.
+204. How did you handle explaining a complex failure to senior leadership?
+205. Describe a time you had to communicate a decision that upset your team.
+206. Tell me about a situation where you had to translate between two fighting departments.
+207. How did you handle being misquoted or misrepresented?
+208. Describe a time your communication prevented a legal or compliance issue.
+209. Tell me about communicating in a language that wasn't your first language under pressure.
+210. How did you handle communicating with a client who had unreasonable expectations?
+
+---
+
+## LOGICAL REASONING QUESTIONS (90 questions)
+
+### Category: Number Series (15 questions)
+
+**Easy (5 questions)**
+
+211. Find next number: 2, 4, 6, 8, 10, ?
+212. Complete series: 5, 10, 15, 20, 25, ?
+213. Find missing: 3, 6, 12, 24, 48, ?
+214. Series: 100, 90, 81, 73, 66, ?
+215. What comes next: 1, 4, 9, 16, 25, ?
+
+**Medium (5 questions)**
+
+216. Find next: 2, 3, 5, 7, 11, 13, ?
+217. Series: 0, 1, 1, 2, 3, 5, 8, ?
+218. Complete: 7, 10, 15, 22, 31, 42, ?
+219. Find pattern: 1, 8, 27, 64, 125, ?
+220. Series: 2, 6, 12, 20, 30, 42, ?
+
+**Hard (5 questions)**
+
+221. Find next: 3, 5, 9, 17, 33, ?
+222. Series: 1, 4, 27, 256, 3125, ?
+223. Complete: 5, 7, 11, 19, 35, 67, ?
+224. Find pattern: 2, 3, 6, 15, 42, ?
+225. Series: 0, 1, 4, 15, 56, ?
+
+---
+
+### Category: Syllogisms (15 questions)
+
+**Easy (5 questions)**
+
+226. All dogs are animals. All animals are living things. Conclusion: All dogs are living things. (True/False)
+227. No cats are dogs. Some pets are cats. Conclusion: Some pets are not dogs. (True/False)
+228. All engineers are problem solvers. John is an engineer. Conclusion: John is a problem solver. (True/False)
+229. Some fruits are apples. All apples are healthy. Conclusion: Some fruits are healthy. (True/False)
+230. No birds are mammals. All parrots are birds. Conclusion: No parrots are mammals. (True/False)
+
+**Medium (5 questions)**
+
+231. All A are B. Some B are C. Conclusion: Some A are C. (True/False/Uncertain)
+232. No P are Q. Some R are P. Conclusion: Some R are not Q. (True/False/Uncertain)
+233. All X are Y. No Y are Z. Conclusion: No X are Z. (True/False/Uncertain)
+234. Some M are N. Some N are O. Conclusion: Some M are O. (True/False/Uncertain)
+235. All engineers are logical. Some logical people are creative. Priya is an engineer. Is Priya creative? (Yes/No/Maybe)
+
+**Hard (5 questions)**
+
+236. All A are B. Some B are C. All C are D. Conclusion: Some A are D. (True/False/Uncertain)
+237. No P are Q. All Q are R. Some S are P. Conclusion: Some S are not R. (True/False/Uncertain)
+238. All X are Y. Some Y are Z. No Z are W. Conclusion: No X are W. (True/False/Uncertain)
+239. Some A are B. No B are C. All C are D. Conclusion: Some A are not D. (True/False/Uncertain)
+240. All engineers are analytical. No analytical person is disorganized. Some organized people are creative. Can an engineer be creative? (Yes/No/Maybe)
+
+---
+
+### Category: Data Sufficiency (15 questions)
+
+**Easy (5 questions)**
+
+241. Is x > 5? Statement 1: x + 3 = 10, Statement 2: x - 2 = 5
+242. What is the age of Ram? Statement 1: Ram is 5 years older than Shyam. Statement 2: Shyam is 20 years old.
+243. Is the number even? Statement 1: Number is divisible by 4. Statement 2: Number ends with 6.
+244. Who is taller, A or B? Statement 1: A is taller than C. Statement 2: C is taller than B.
+245. What is the total cost? Statement 1: 5 pens cost ₹50. Statement 2: 3 pens and 2 pencils cost ₹40.
+
+**Medium (5 questions)**
+
+246. Is x a prime number? Statement 1: x is odd. Statement 2: x is between 10 and 20.
+247. What is the average of five numbers? Statement 1: Sum of numbers is 100. Statement 2: Median is 20.
+248. Is x² > y²? Statement 1: x > y. Statement 2: x + y > 0.
+249. What day is today? Statement 1: Tomorrow is Wednesday. Statement 2: Yesterday was Monday.
+250. Is quadrilateral ABCD a square? Statement 1: All sides are equal. Statement 2: All angles are 90°.
+
+**Hard (5 questions)**
+
+251. What is the value of x? Statement 1: x² - 5x + 6 = 0. Statement 2: x > 0.
+252. Is a > b? Statement 1: a² > b². Statement 2: a³ > b³.
+253. What is the profit percentage? Statement 1: Selling price is ₹120. Statement 2: Profit is ₹20.
+254. Is x divisible by 6? Statement 1: x is divisible by 2. Statement 2: x is divisible by 3.
+255. How many students passed? Statement 1: 60% of students passed. Statement 2: 40% failed and 20 students were absent.
+
+---
+
+### Category: Coding Logic (15 questions)
+
+**Easy (5 questions)**
+
+256. What will be output? for(i=0;i<5;i++) { print(i); }
+257. What does this function do? function mystery(a,b) { return a+b; }
+258. Find output: x=5; while(x>0) { print(x); x--; }
+259. Complete code: if(age ___ 18) { print("Adult"); } else { print("Minor"); }
+260. What is result? [1,2,3] + [4,5,6] in JavaScript?
+
+**Medium (5 questions)**
+
+261. Find output: for(i=0;i<3;i++) { for(j=0;j<2;j++) { print(i*j); } }
+262. What does this recursive function do? function fact(n) { if(n<=1) return 1; return n*fact(n-1); }
+263. Find bug: function max(a,b) { if(a>b) return a; return a; }
+264. What is output? let x = 10; function test() { let x = 20; print(x); } test(); print(x);
+265. Complete logic: function isPalindrome(str) { return str === str.___; }
+
+**Hard (5 questions)**
+
+266. What does this algorithm find? function search(arr,target) { let left=0,right=arr.length-1; while(left<=right) { let mid=Math.floor((left+right)/2); if(arr[mid]==target) return mid; else if(arr[mid]<target) left=mid+1; else right=mid-1; } return -1; }
+267. Find time complexity: for(i=0;i<n;i++) { for(j=0;j<n;j++) { for(k=0;k<n;k++) { print(i*j*k); } } }
+268. What is output? console.log(typeof null); console.log(typeof undefined);
+269. Complete sorting logic: function bubbleSort(arr) { for(let i=0;i<arr.length;i++) { for(let j=0;j<arr.length-1-i;j++) { if(arr[j] ___ arr[j+1]) { // swap } } } }
+270. What does this return? [1,2,3,4,5].filter(x=>x%2===0).map(x=>x*2).reduce((a,b)=>a+b,0)
+
+---
+
+### Category: Verbal Reasoning (15 questions)
+
+**Easy (5 questions)**
+
+271. If "STUDENT" is coded as "VWXGHQW", how is "TEACHER" coded?
+272. Find odd one out: Apple, Mango, Orange, Carrot, Banana
+273. Complete analogy: Doctor : Hospital :: Teacher : ?
+274. If REASON = 6, LOGIC = 5, then THINKING = ?
+275. Arrange in order: Interview, Application, Offer, Screening, Joining
+
+**Medium (5 questions)**
+
+276. Statement: "All that glitters is not gold." Conclusion: Some things that glitter are not gold. (True/False)
+277. If EARTH = 5, MARS = 4, then JUPITER = ?
+278. Find next in sequence: AZ, BY, CX, DW, ?
+279. Statement: "Work hard or you will fail." Which assumption is valid? a) Hard work prevents failure b) Some people fail despite hard work
+280. If TABLE = 20, CHAIR = 15, then BENCH = ?
+
+**Hard (5 questions)**
+
+281. Statement: "Most IT professionals in India are engineers." Conclusion 1: Some engineers are IT professionals. Conclusion 2: Some IT professionals are not engineers.
+282. If MASTER = 79, SERVANT = 92, then LEADER = ?
+283. Find pattern: 1, 11, 21, 1211, 111221, ?
+284. Statement: "Without data, you're just another person with an opinion." What can be inferred?
+285. If WORK = 4, HARD = 5, then SMART = ?
+
+---
+
+### Category: Arrangements & Patterns (15 questions)
+
+**Easy (5 questions)**
+
+286. Five people sitting in a row: A is left of B, C is right of D, E is at extreme right. Who is in middle?
+287. Find missing: 2, 6, 12, 20, ?, 42
+288. If day after tomorrow is Friday, what day is today?
+289. Arrange in dictionary order: Apple, Ant, Ball, Cat, Bat
+290. Find next shape pattern: Circle, Triangle, Square, Circle, Triangle, ?
+
+**Medium (5 questions)**
+
+291. Six friends sitting in circle. A is between B and C. D is opposite A. E is left of F. Where is F?
+292. Complete sequence: 3, 8, 15, 24, 35, ?
+293. If 15th August is Monday, what day is 1st September?
+294. Find odd one: 121, 144, 169, 196, 200
+295. Pattern: 1, 4, 9, 16, 25, 36, 49, ?
+
+**Hard (5 questions)**
+
+296. Seven people in a row. A is 3rd from left. B is 2nd from right. C is left of A. D is between B and E. Who is in middle?
+297. Find next: 1, 1, 2, 3, 5, 8, 13, 21, ?
+298. Three clocks show 3:00, 3:15, 3:30. Next will show?
+299. Pattern: 0, 7, 26, 63, 124, ?
+300. Complete: 1, 8, 9, 64, 25, 216, ?
+
+---
+
+## DIFFICULTY DISTRIBUTION
+
+### Behavioral (210 questions)
+- Easy: 70 questions
+- Medium: 70 questions  
+- Hard: 70 questions
+
+### Logical Reasoning (90 questions)
+- Easy: 30 questions
+- Medium: 30 questions
+- Hard: 30 questions
+
+---
+
+## KEYWORD MAPS (Sample - would be stored in DB)
+
+### Sample Behavioral Keywords per category:
+
+**Leadership**: [lead, guide, direct, manage, mentor, coach, inspire, motivate, delegate, decide, initiative, responsibility, accountable, vision, strategy]
+
+**Conflict Resolution**: [resolve, mediate, negotiate, compromise, communicate, listen, understand, empathize, calm, solution, agree, disagree, apologize, feedback]
+
+**Teamwork**: [collaborate, cooperate, support, help, share, contribute, coordinate, together, collective, joint, assist, partner, align, synergy]
+
+**Adaptability**: [adapt, adjust, flexible, pivot, change, learn, new, different, unexpected, modify, evolve, respond, agile, resilient]
+
+**Problem Solving**: [solve, debug, fix, resolve, troubleshoot, analyze, identify, root cause, solution, creative, approach, method, systematic, logical]
+
+**Pressure & Deadlines**: [deadline, urgent, pressure, stress, time, schedule, deliver, commit, prioritize, focus, calm, composed, overtime, critical]
+
+### Sample Logical Keywords per category:
+
+**Number Series**: [pattern, sequence, difference, multiple, square, cube, prime, fibonacci, arithmetic, geometric, increment, decrement, ratio]
+
+**Syllogisms**: [all, some, none, no, conclusion, premise, logical, deductive, venn, set, subset, universal, particular, categorical]
+
+**Data Sufficiency**: [sufficient, necessary, statement, alone, together, both, either, neither, enough, information, condition, combine]
+
+**Coding Logic**: [loop, condition, variable, function, recursion, iteration, array, output, syntax, logic, algorithm, complexity, return]
+
+**Verbal Reasoning**: [analogy, coding, decoding, sequence, pattern, assumption, inference, conclusion, odd one, classification, order, ranking]
+
+**Arrangements**: [position, order, sequence, row, circle, arrangement, sitting, left, right, between, opposite, adjacent, clockwise]
+
+---
+
+## SAMPLE ANSWERS (Examples - hidden from users)
+
+**Behavioral Easy Sample Answer (Leadership #1):**
+"I led a team of 4 in my final year project. I created a shared timeline, assigned tasks based on each person's strengths, held weekly syncs, and when one member struggled with their module, I paired them with another member for mentorship. We delivered 2 weeks early and got an A grade."
+
+**Logical Easy Sample Answer (Number Series #211):**
+"Pattern: Add 2 each time. Next number: 12"
+
+---
+
+This question bank provides complete coverage with 300 questions, 70% behavioral (210) and 30% logical (90), all focused on Indian placement contexts with appropriate difficulty distribution across easy/medium/hard levels.

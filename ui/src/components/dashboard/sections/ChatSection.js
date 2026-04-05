@@ -280,10 +280,10 @@ export default function ChatSection({ preselectedUser = null }) {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row flex-1 w-full bg-[#0A0A0A] overflow-hidden relative text-[#F5F0EB] font-sans font-['DM_Sans']">
+    <div className="flex flex-col lg:flex-row w-full h-[100vh] bg-[#0A0A0A] overflow-hidden relative text-[#F5F0EB] font-['DM_Sans']">
       
       {/* 2. USER LIST (LEFT PANEL) - SLEEK DARK */}
-      <div className={`flex flex-col w-full lg:w-[380px] border-r border-[#2A2520] bg-[#111111] ${selectedUser ? 'hidden lg:flex' : 'flex'}`}>
+      <div className={`flex flex-col h-full w-full lg:w-[380px] border-r border-[#2A2520] bg-[#111111] ${selectedUser ? 'hidden lg:flex' : 'flex'}`}>
         
         {/* Header */}
         <div className="p-4 sm:p-6 border-b border-[#2A2520] flex items-center justify-between bg-[#1C1C1C]/30 backdrop-blur-xl">
@@ -398,7 +398,7 @@ export default function ChatSection({ preselectedUser = null }) {
       </div>
 
       {/* 3. CHAT WINDOW (RIGHT PANEL) - PROFESSIONAL DARK */}
-      <div className={`flex-1 flex flex-col bg-[#0A0A0A] relative ${!selectedUser ? 'hidden lg:flex' : 'flex'}`}>
+      <div className={`flex-1 h-full flex flex-col bg-[#0A0A0A] relative ${!selectedUser ? 'hidden lg:flex' : 'flex'}`}>
         {selectedUser ? (
           <>
             {/* Header */}
@@ -442,14 +442,14 @@ export default function ChatSection({ preselectedUser = null }) {
                   </button>
                   {showOptionsDropdown && (
                     <div className="absolute right-0 top-full mt-3 w-56 bg-[#1C1C1C] border border-[#2A2520] rounded-2xl shadow-2xl py-2 z-50 animate-in fade-in slide-in-from-top-4 duration-300 ring-1 ring-black/20">
-                      <button onClick={() => handleViewProfile(selectedUser)} className="w-full px-5 py-3 text-left text-sm font-['DM_Sans'] text-[#F5F0EB] hover:bg-[#FF6B35] hover:text-white flex items-center gap-4 transition-all mx-1 rounded-xl w-[calc(100%-8px)]">
+                      <button onClick={() => handleViewProfile(selectedUser)} className="px-5 py-3 text-left text-sm font-['DM_Sans'] text-[#F5F0EB] hover:bg-[#FF6B35] hover:text-white flex items-center gap-4 transition-all mx-1 rounded-xl w-[calc(100%-8px)]">
                         <User size={18} /> View Dynamic Profile
                       </button>
                       <div className="h-px bg-white/5 my-1 mx-4"></div>
-                      <button onClick={handleClearChat} className="w-full px-5 py-3 text-left text-sm font-['DM_Sans'] text-red-400 hover:bg-red-500/10 flex items-center gap-4 transition-all mx-1 rounded-xl w-[calc(100%-8px)]">
+                      <button onClick={handleClearChat} className="px-5 py-3 text-left text-sm font-['DM_Sans'] text-red-400 hover:bg-red-500/10 flex items-center gap-4 transition-all mx-1 rounded-xl w-[calc(100%-8px)]">
                         <Trash2 size={18} /> Purge Chat History
                       </button>
-                      <button onClick={handleBlockUser} className="w-full px-5 py-3 text-left text-sm font-['DM_Sans'] text-[#A89E94] hover:bg-white/5 flex items-center gap-4 transition-all mx-1 rounded-xl w-[calc(100%-8px)]">
+                      <button onClick={handleBlockUser} className="px-5 py-3 text-left text-sm font-['DM_Sans'] text-[#A89E94] hover:bg-white/5 flex items-center gap-4 transition-all mx-1 rounded-xl w-[calc(100%-8px)]">
                         {selectedUser.isBlocked ? (
                           <><UserCheck size={18} className="text-emerald-400" /> Restore Access</>
                         ) : (

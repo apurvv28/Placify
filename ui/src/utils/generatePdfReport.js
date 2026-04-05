@@ -1,7 +1,7 @@
-import html2pdf from 'html2pdf.js';
+import html2pdf from 'html2pdf.js/dist/html2pdf.bundle.min.js';
 
 export const generatePdfReport = async (analysis, linkVerification, candidateName = 'Candidate') => {
-  const { score, scoreRationale, detectedRole, sectionNotes, keywordMatch, formattingIssues, improvementChecklist, nextSteps } = analysis;
+  const { score, scoreRationale, detectedRole, sectionNotes, keywordMatch, formattingIssues, nextSteps } = analysis;
 
   const htmlContent = `
     <div style="font-family: 'Helvetica Neue', Arial, sans-serif; color: #111; max-width: 800px; margin: 0 auto; padding: 40px; background: #fff;">

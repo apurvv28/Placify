@@ -6,15 +6,19 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "echo \"No tests configured\""
+    "test": "echo \"No tests configured\"",
+    "interviewiq:import:dry": "node src/scripts/importInterviewIQQuestions.js",
+    "interviewiq:import": "node src/scripts/importInterviewIQQuestions.js --apply"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "^3.937.0",
     "@aws-sdk/client-dynamodb": "^3.600.0",
     "@aws-sdk/client-s3": "^3.600.0",
+    "@aws-sdk/client-transcribe": "^3.937.0",
     "@aws-sdk/lib-dynamodb": "^3.600.0",
     "@google/generative-ai": "^0.24.1",
     "bcryptjs": "^2.4.3",

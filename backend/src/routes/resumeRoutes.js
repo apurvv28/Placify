@@ -1,7 +1,7 @@
 const express = require('express');
 const { 
   getResume, saveResume, clearResume, createResume, getResumes, 
-  viewResume, likeResume, addComment, deleteComment 
+  viewResume, likeResume, addComment, deleteComment, suggestProfessionalSummary 
 } = require('../controllers/resumeController');
 const protect = require('../middlewares/authMiddleware');
 const multer = require('multer');
@@ -29,6 +29,7 @@ const upload = multer({
 router.get('/', protect, getResume);
 router.post('/', protect, saveResume);
 router.delete('/', protect, clearResume);
+router.post('/summary-suggest', protect, suggestProfessionalSummary);
 
 // Placed Student Resume Upload Routes
 router.get('/all', getResumes);

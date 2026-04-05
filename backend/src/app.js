@@ -10,6 +10,7 @@ const { notFound, errorHandler } = require('./middlewares/errorMiddleware');
 const messageRoutes = require('./routes/messageRoutes');
 const chatbotRoutes = require('./routes/chatbotRoutes');
 const userRoutes = require('./routes/userRoutes');
+const interviewIQRoutes = require('./routes/interviewiqRoutes');
 const { isS3ResumeStorageEnabled, getResumeObject } = require('./config/s3');
 
 const app = express();
@@ -70,6 +71,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/ats', atsRoutes);
 app.use('/api/resume', resumeRoutes);
 app.use('/api/resumes', resumeRoutes);
+app.use('/api/interviewiq', interviewIQRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

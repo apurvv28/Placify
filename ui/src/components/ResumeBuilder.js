@@ -45,6 +45,7 @@ export default function ResumeBuilder() {
     const [activeField, setActiveField] = useState('personalInfo');
 
     const [loading, setLoading] = useState(false);
+    const [summarySuggestLoading, setSummarySuggestLoading] = useState(false);
     const [showPreview, setShowPreview] = useState(false);
     const [user, setUser] = useState(null);
     const resumeRef = useRef(null);
@@ -157,6 +158,46 @@ export default function ResumeBuilder() {
         } catch (error) {
             console.error('Error generating PDF', error);
             alert('Failed to generate PDF.');
+        }
+    };
+
+    const handleSuggestSummary = async () => {
+        const token = localStorage.getItem('placifyToken');
+        if (!token) {
+            alert('Please login again to use AI summary suggestions.');
+            return;
+        }
+
+        setSummarySuggestLoading(true);
+        try {
+            const { data } = await axios.post(
+                `${API_URL}/summary-suggest`,
+                {
+                    personalInfo,
+                    professionalSummary,
+                    experience,
+                    skills,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            if (!data?.suggestion) {
+                alert('AI could not generate a summary. Please try again.');
+                return;
+            }
+
+            setProfessionalSummary(data.suggestion);
+        } catch (error) {
+            const message =
+                error?.response?.data?.message ||
+                'Failed to generate AI summary. Please check backend configuration and try again.';
+            alert(message);
+        } finally {
+            setSummarySuggestLoading(false);
         }
     };
 
@@ -366,8 +407,13 @@ export default function ResumeBuilder() {
                         <div className="h-full flex flex-col">
                             <div className="flex items-center justify-between mb-4 border-b border-[#2A2520] pb-2">
                                 <h3 className="font-semibold text-lg font-['Syne'] text-[#F5F0EB]">Professional Summary</h3>
-                                <button type="button" className="text-xs px-3 py-1.5 rounded-full bg-purple-500/15 text-purple-300 border border-purple-400/20 hover:bg-purple-500/25 transition-colors flex items-center gap-1">
-                                    <Sparkles size={12} /> AI Suggest
+                                <button
+                                    type="button"
+                                    onClick={handleSuggestSummary}
+                                    disabled={summarySuggestLoading}
+                                    className="text-xs px-3 py-1.5 rounded-full bg-purple-500/15 text-purple-300 border border-purple-400/20 hover:bg-purple-500/25 transition-colors flex items-center gap-1 disabled:opacity-60 disabled:cursor-not-allowed"
+                                >
+                                    <Sparkles size={12} /> {summarySuggestLoading ? 'Generating...' : 'AI Suggest'}
                                 </button>
                             </div>
                             <textarea
@@ -536,7 +582,7 @@ export default function ResumeBuilder() {
                                 {/* ================= TEMPLATE 1: Sidebar Left ================= */}
                                 {template === 'Template1' && (
                                     <div className="flex h-full min-h-[297mm]">
-                                        <div className="w-[30%] p-8 pt-12 flex flex-col pt-12">
+                                        <div className="w-[30%] p-8 pt-12 flex flex-col">
                                             {/* Initial Box */}
                                             <div className="bg-black w-24 h-24 flex items-center justify-center mb-6 self-end">
                                                 <span className="text-5xl font-light text-[#00c896] leading-none">{getInitials(personalInfo.name)}</span>
@@ -544,7 +590,7 @@ export default function ResumeBuilder() {
 
                                             {/* Name */}
                                             <div className="text-right mb-6">
-                                                <h1 className="text-2xl font-bold font-['Syne'] text-[#F5F0EB] border-l-2 border-[#FF6B35] pl-3 text-[#00c896] leading-tight flex flex-col">
+                                                <h1 className="text-2xl font-bold font-['Syne'] border-l-2 border-[#FF6B35] pl-3 text-[#00c896] leading-tight flex flex-col">
                                                     {personalInfo.name.split(' ').map((n, i) => <span key={i}>{n}</span>)}
                                                 </h1>
                                             </div>
@@ -779,7 +825,7 @@ export default function ResumeBuilder() {
                                             </div>
                                         </div>
 
-                                        <div className="p-12 flex flex-col gap-6 font-sans font-['DM_Sans']">
+                                        <div className="p-12 flex flex-col gap-6 font-['DM_Sans']">
                                             {/* Shared Body for T3, slightly modified styles */}
                                             {professionalSummary && (
                                                 <div className="flex gap-8 pb-4">
