@@ -44,6 +44,17 @@ const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+const getMediaFormatFromS3Key = (s3Key = '') => {
+  const ext = String(path.extname(s3Key || '') || '')
+    .toLowerCase()
+    .replace('.', '');
+
+  if (ext === 'm4v') return 'mp4';
+  if (ext === 'mkv') return 'webm';
+  if (ext === 'mov' || ext === 'mp4' || ext === 'webm' || ext === 'ogg') return ext;
+  return 'webm';
+};
+
 const safeJsonParse = (value, fallback = null) => {
   try {
     return JSON.parse(value);
@@ -153,7 +164,7 @@ const getTranscriptFromTranscribe = async ({ s3Key }) => {
     new StartTranscriptionJobCommand({
       TranscriptionJobName: transcriptionJobName,
       LanguageCode: getEnv('INTERVIEWIQ_TRANSCRIBE_LANGUAGE', 'en-US'),
-      MediaFormat: 'webm',
+      MediaFormat: getMediaFormatFromS3Key(s3Key),
       Media: {
         MediaFileUri: mediaUri,
       },
@@ -255,10 +266,27 @@ const getModel1TranscriptAndLLM = async ({ transcriptText, questionType }) => {
   const wordCount = words.length;
   const fillerWordCount = countFillerWords(transcriptText);
 
-  const clarity = clamp(Math.round(Math.min(25, wordCount / 8) - fillerWordCount * 0.3), 6, 25);
-  const relevance = clamp(Math.round(Math.min(25, wordCount / 10) + 5), 8, 25);
-  const depth = clamp(Math.round(Math.min(25, wordCount / 12) + 4), 7, 25);
-  const communication = clamp(Math.round(Math.min(25, wordCount / 9) - fillerWordCount * 0.2), 6, 25);
+  if (!wordCount) {
+    return {
+      clarity: 0,
+      relevance: 0,
+      depth: 0,
+      communication: 0,
+      starScore: 0,
+      overallFeedback: 'Transcript unavailable. Score could not be fully evaluated.',
+      strengths: [],
+      improvements: ['Please ensure microphone permissions and AWS transcription availability.'],
+      fillerWordCount,
+      transcriptText: transcriptText || '',
+      transcriptAvailable: false,
+      llmAvailable: false,
+    };
+  }
+
+  const clarity = clamp(Math.round(Math.min(25, wordCount / 8) - fillerWordCount * 0.3), 0, 25);
+  const relevance = clamp(Math.round(Math.min(25, wordCount / 10) + 5), 0, 25);
+  const depth = clamp(Math.round(Math.min(25, wordCount / 12) + 4), 0, 25);
+  const communication = clamp(Math.round(Math.min(25, wordCount / 9) - fillerWordCount * 0.2), 0, 25);
 
   const hasSituation = /\bsituation\b/i.test(transcriptText);
   const hasTask = /\btask\b/i.test(transcriptText);
@@ -278,6 +306,8 @@ const getModel1TranscriptAndLLM = async ({ transcriptText, questionType }) => {
     improvements: ['Use fewer filler words', 'Add quantified results where possible'],
     fillerWordCount,
     transcriptText: transcriptText || '',
+    transcriptAvailable: true,
+    llmAvailable: false,
   };
 };
 
@@ -303,6 +333,8 @@ const getModel1TranscriptAndLLMReal = async ({ s3Key, transcriptHint, questionTy
     return {
       ...llmScores,
       transcriptText,
+      transcriptAvailable: true,
+      llmAvailable: true,
     };
   } catch {
     return getModel1TranscriptAndLLM({ transcriptText, questionType });
@@ -311,7 +343,24 @@ const getModel1TranscriptAndLLMReal = async ({ s3Key, transcriptHint, questionTy
 
 const getModel2AntiCheat = async ({ s3Key }) => {
   const hfApiKey = process.env.HUGGINGFACE_API_KEY || '';
-  const hfModel = getEnv('INTERVIEWIQ_HF_MODEL', 'google/mediapipe-face-detection');
+  const configuredModel = getEnv('INTERVIEWIQ_HF_MODEL', 'google/mediapipe-face-detection');
+  const fallbackModels = [
+    configuredModel,
+    'facebook/detr-resnet-50',
+    'hustvl/yolos-tiny',
+  ].filter(Boolean);
+
+  const parsePersonDetections = (prediction) => {
+    const items = Array.isArray(prediction) ? prediction : [];
+    return items.filter((item) => {
+      const label = String(item?.label || item?.class || item?.name || '').toLowerCase();
+      if (!label) {
+        // Face detector style outputs may not include labels; treat bounding-box entries as valid detections.
+        return Boolean(item?.box || item?.xmin !== undefined || item?.xmax !== undefined);
+      }
+      return label.includes('person') || label.includes('human') || label.includes('face');
+    });
+  };
 
   if (!hfApiKey) {
     return {
@@ -351,27 +400,47 @@ const getModel2AntiCheat = async ({ s3Key }) => {
     let multipleFacesCount = 0;
     let noFaceCount = 0;
 
+    let selectedModel = null;
+
     for (const fileName of files) {
       const frameBuffer = await fs.readFile(path.join(tempDir, fileName));
 
-      const response = await fetch(`https://api-inference.huggingface.co/models/${hfModel}`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${hfApiKey}`,
-          'Content-Type': 'application/octet-stream',
-        },
-        body: frameBuffer,
-      });
+      let detections = [];
+      let modelWorked = false;
 
-      if (!response.ok) {
-        throw new Error(`HF API failed with status ${response.status}`);
+      const modelsToTry = selectedModel ? [selectedModel] : fallbackModels;
+      let lastModelError = null;
+
+      for (const modelName of modelsToTry) {
+        const response = await fetch(`https://api-inference.huggingface.co/models/${modelName}`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${hfApiKey}`,
+            'Content-Type': 'application/octet-stream',
+          },
+          body: frameBuffer,
+        });
+
+        const payload = await response.json().catch(() => ({}));
+        const apiError = String(payload?.error || '');
+
+        if (!response.ok || apiError) {
+          lastModelError = new Error(apiError || `HF API failed with status ${response.status}`);
+          continue;
+        }
+
+        selectedModel = modelName;
+        detections = parsePersonDetections(payload);
+        modelWorked = true;
+        break;
       }
 
-      const prediction = await response.json();
-      const boxes = Array.isArray(prediction) ? prediction : [];
+      if (!modelWorked) {
+        throw lastModelError || new Error('No available Hugging Face model could process frames.');
+      }
 
-      if (boxes.length === 0) noFaceCount += 1;
-      if (boxes.length > 1) multipleFacesCount += 1;
+      if (detections.length === 0) noFaceCount += 1;
+      if (detections.length > 1) multipleFacesCount += 1;
     }
 
     const flags = [];
@@ -385,12 +454,14 @@ const getModel2AntiCheat = async ({ s3Key }) => {
       cheatDetected,
       flags,
       confidenceScore,
+      modelUsed: selectedModel,
     };
   } catch {
     return {
       cheatDetected: false,
       flags: ['evaluation_unavailable'],
       confidenceScore: null,
+      modelUsed: null,
     };
   } finally {
     try {
@@ -429,17 +500,37 @@ const getModel3KeywordHeuristic = ({ transcriptText, keywords }) => {
 };
 
 const getFinalScore = ({ llmScores, keywordScores, antiCheatResult }) => {
-  const transcriptLLMScore =
+  const transcriptLLMRaw =
     Number(llmScores.clarity || 0) +
     Number(llmScores.relevance || 0) +
     Number(llmScores.depth || 0) +
     Number(llmScores.communication || 0) +
     Number(llmScores.starScore || 0);
 
-  const antiCheatPenalty = antiCheatResult.cheatDetected ? -20 : 100;
+  const isBehavioral = Number(llmScores.starScore || 0) > 0;
+  const llmMax = isBehavioral ? 110 : 100;
+  const llmPercent = clamp(Math.round((transcriptLLMRaw / llmMax) * 100), 0, 100);
 
-  const finalScore =
-    transcriptLLMScore * 0.5 + Number(keywordScores.keywordScore || 0) * 0.3 + antiCheatPenalty * 0.2;
+  const antiCheatUnavailable =
+    antiCheatResult?.confidenceScore === null ||
+    (Array.isArray(antiCheatResult?.flags) && antiCheatResult.flags.includes('evaluation_unavailable'));
+
+  const antiCheatScore = antiCheatUnavailable
+    ? 50
+    : antiCheatResult?.cheatDetected
+    ? clamp(100 - Number(antiCheatResult?.confidenceScore || 100), 0, 100)
+    : 100;
+
+  const keywordPercent = clamp(Number(keywordScores.keywordScore || 0), 0, 100);
+
+  const hasTranscript = Boolean(llmScores?.transcriptAvailable);
+  const hasKeywordSignal = keywordPercent > 0;
+
+  if (!hasTranscript && !hasKeywordSignal) {
+    return 0;
+  }
+
+  const finalScore = llmPercent * 0.45 + keywordPercent * 0.35 + antiCheatScore * 0.2;
 
   return clamp(Math.round(finalScore), 0, 100);
 };

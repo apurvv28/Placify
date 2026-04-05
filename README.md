@@ -35,6 +35,29 @@
 
 **Placify** is a comprehensive, AI-integrated placement preparation and networking platform. Designed specifically for students and recruiters, Placify seamlessly integrates real-time communications, automated resume analysis via Google Gemini and Groq, an advanced AI chatbot, and a robust community networking feed.
 
+## 🎯 New Feature: InterviewIQ (AI Mock Interview Engine)
+
+Placify now includes **InterviewIQ**, a deck-based mock interview system with a resilient **3-model evaluation pipeline**:
+
+- **Model 1 (Transcript + LLM Scoring):**
+  - Converts recorded response to transcript (AWS Transcribe).
+  - Scores clarity, relevance, depth, communication, and STAR adherence for behavioral questions.
+- **Model 2 (Video Anti-Cheat):**
+  - Performs frame-based monitoring to detect missing/multiple-person scenarios.
+  - Uses Hugging Face inference with automatic fallback if a configured model is unavailable.
+- **Model 3 (Keyword Heuristic):**
+  - Measures keyword coverage and filler-word penalty from transcript.
+
+### ✅ Reliability Upgrades Included
+
+- Upload path hardened for browser recorder MIME edge-cases (`blob`, generic MIME, empty MIME metadata).
+- Score computation updated to prevent constant baseline outputs when transcript/model signals are missing.
+- Anti-cheat now supports HF fallback model chain:
+  - configured `INTERVIEWIQ_HF_MODEL`
+  - `facebook/detr-resnet-50`
+  - `hustvl/yolos-tiny`
+- Raw recording cleanup is retained while transcript artifact is persisted for auditability.
+
 ## 🛠 Tech Stack & System Integration
 
 The architecture follows a robust **Client-Server** model connecting modern AI tools with a high-performance MERN stack structure:
@@ -115,6 +138,21 @@ The architecture follows a robust **Client-Server** model connecting modern AI t
 | ----- | -------- | -------------- | ------------------------------------- |
 | `/` | `POST` | Public/Private | Bridge conversational query to Gen-AI |
 
+### 🎤 InterviewIQ (`/api/interviewiq`)
+
+| Route | Method | Access | Description |
+| ----- | ------ | ------ | ----------- |
+| `/progress` | `GET` | Private | Fetch InterviewIQ progress and current deck status |
+| `/deck/:deckNumber` | `GET` | Private | Retrieve deck metadata and ordered questions |
+| `/deck/:deckNumber/start` | `POST` | Private | Mark a deck as started |
+| `/response/upload` | `POST` | Private | Upload recorded answer for async evaluation |
+| `/response/:responseId` | `GET` | Private | Poll evaluation result status/details |
+| `/deck/:deckNumber/results` | `GET` | Private | Fetch aggregated deck results |
+| `/heatmap` | `GET` | Private | Weak-area heatmap across completed responses |
+| `/leaderboard` | `GET` | Recruiter | Leaderboard insights |
+| `/highlights` | `GET` | Recruiter | Top answer highlights |
+| `/questions/seed` | `GET` | Admin | Seed question bank |
+
 ---
 
 ## 🏃 Getting Started & Installation
@@ -123,8 +161,10 @@ The architecture follows a robust **Client-Server** model connecting modern AI t
 
 - Node.js (v18+)
 - AWS account with DynamoDB access
+- AWS S3, AWS Transcribe, AWS Bedrock access (for InterviewIQ evaluation)
 - AWS CLI configured profile (`default`) for local backend runtime
 - Gemini and Groq API Keys
+- Hugging Face API Key (for InterviewIQ anti-cheat model inference)
 
 ### Quick Setup
 
@@ -140,6 +180,10 @@ The architecture follows a robust **Client-Server** model connecting modern AI t
    cd backend
    npm install
   # Configure .env: PORT, JWT_SECRET, GEMINI_API_KEY, GROQ_API_KEY, CLIENT_ORIGIN, AWS_REGION, DYNAMODB_*_TABLE
+  # InterviewIQ: S3_INTERVIEWIQ_BUCKET, INTERVIEWIQ_BEDROCK_MODEL_ID, INTERVIEWIQ_HF_MODEL, HUGGINGFACE_API_KEY,
+  #              INTERVIEWIQ_TRANSCRIBE_LANGUAGE, INTERVIEWIQ_TRANSCRIBE_MAX_POLLS, INTERVIEWIQ_TRANSCRIBE_POLL_MS,
+  #              DYNAMODB_INTERVIEWIQ_QUESTIONS_TABLE, DYNAMODB_INTERVIEWIQ_DECKS_TABLE,
+  #              DYNAMODB_INTERVIEWIQ_RESPONSES_TABLE, DYNAMODB_INTERVIEWIQ_USER_PROGRESS_TABLE
   # Configure AWS credentials (one time): aws configure --profile default
    npm start # or npm run dev
    ```
@@ -188,6 +232,17 @@ The architecture follows a robust **Client-Server** model connecting modern AI t
   - `DYNAMODB_RESUMES_TABLE=PlacifyResumes`
   - `DYNAMODB_MESSAGES_TABLE=PlacifyMessages`
   - `DYNAMODB_CONVERSATIONS_TABLE=PlacifyConversations`
+  - `DYNAMODB_INTERVIEWIQ_QUESTIONS_TABLE=PlacifyInterviewIQQuestions`
+  - `DYNAMODB_INTERVIEWIQ_DECKS_TABLE=PlacifyInterviewIQDecks`
+  - `DYNAMODB_INTERVIEWIQ_RESPONSES_TABLE=PlacifyInterviewIQResponses`
+  - `DYNAMODB_INTERVIEWIQ_USER_PROGRESS_TABLE=PlacifyInterviewIQUserProgress`
+  - `S3_INTERVIEWIQ_BUCKET=<your-interviewiq-bucket>`
+  - `INTERVIEWIQ_BEDROCK_MODEL_ID=amazon.nova-micro-v1:0`
+  - `INTERVIEWIQ_HF_MODEL=google/mediapipe-face-detection`
+  - `HUGGINGFACE_API_KEY=<your-key>`
+  - `INTERVIEWIQ_TRANSCRIBE_LANGUAGE=en-US`
+  - `INTERVIEWIQ_TRANSCRIBE_MAX_POLLS=30`
+  - `INTERVIEWIQ_TRANSCRIBE_POLL_MS=4000`
   - `GEMINI_API_KEY=<your-key>`
   - `GROQ_API_KEY=<your-key>`
 4. Configure AWS credentials for Vercel runtime (IAM user keys):
@@ -246,6 +301,10 @@ Required tables in `ap-south-1`:
 - `PlacifyComments`
 - `PlacifyResumes`
 - `PlacifyMessages`
+- `PlacifyInterviewIQQuestions`
+- `PlacifyInterviewIQDecks`
+- `PlacifyInterviewIQResponses`
+- `PlacifyInterviewIQUserProgress`
 
 If any table is missing, related features (user pool, resumes, chat) may fail.
 
