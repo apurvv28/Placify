@@ -31,8 +31,8 @@ export default function QuestionRecorder({ question, onRecorded, onError }) {
     });
 
     const config = {
-      videoBitsPerSecond: 220000,
-      audioBitsPerSecond: 48000,
+      videoBitsPerSecond: 160000,
+      audioBitsPerSecond: 32000,
     };
 
     if (supportedType) {
@@ -49,9 +49,9 @@ export default function QuestionRecorder({ question, onRecorded, onError }) {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
           video: {
-            width: { ideal: 640 },
-            height: { ideal: 360 },
-            frameRate: { ideal: 15, max: 24 },
+            width: { ideal: 480 },
+            height: { ideal: 270 },
+            frameRate: { ideal: 12, max: 18 },
           },
           audio: {
             echoCancellation: true,

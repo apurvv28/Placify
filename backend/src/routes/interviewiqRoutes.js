@@ -22,7 +22,25 @@ const upload = multer({
     fileSize: 80 * 1024 * 1024,
   },
   fileFilter: (req, file, cb) => {
-    if ((file.mimetype || '').startsWith('video/')) {
+    const mimeType = String(file.mimetype || '').toLowerCase();
+    const originalName = String(file.originalname || '').toLowerCase();
+    const fieldName = String(file.fieldname || '').toLowerCase();
+
+    // This endpoint only accepts the interview recorder payload under "recording".
+    // Browsers can send inconsistent mime/filename metadata (e.g. empty type or "blob").
+    // Accept the expected field while still keeping a media-oriented heuristic.
+    const isExpectedRecordingField = fieldName === 'recording';
+    const hasKnownVideoExtension = /\.(webm|mp4|mov|m4v|ogg|mkv)$/i.test(originalName);
+    const isVideoMime = mimeType.startsWith('video/');
+    const isBrowserGenericMime = mimeType === 'application/octet-stream';
+    const isRecorderMediaMime = /(audio|video)\/(webm|mp4|quicktime|ogg|x-matroska)/i.test(mimeType);
+    const hasUnknownBrowserBlobMetadata = mimeType === '' || originalName === '' || originalName === 'blob';
+
+    if (isExpectedRecordingField && (isVideoMime || isRecorderMediaMime || isBrowserGenericMime || hasKnownVideoExtension || hasUnknownBrowserBlobMetadata)) {
+      return cb(null, true);
+    }
+
+    if (isVideoMime || isRecorderMediaMime || (isBrowserGenericMime && hasKnownVideoExtension) || hasKnownVideoExtension) {
       return cb(null, true);
     }
     return cb(new Error('Only video files are allowed.'));
