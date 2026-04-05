@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { 
   Search, MoreVertical, Paperclip, Smile, Send, Check, CheckCheck, 
   Shield, ArrowLeft, Trash2, UserX, UserCheck, User, Info, MessageSquare, 
-  X, ExternalLink, Heart, ThumbsUp, Frown, Ghost, Flame
+  X, ExternalLink, Heart, ThumbsUp, Frown, Ghost, Flame, Copy, Mail, AlertTriangle
 } from 'lucide-react';
 import { useSocket } from '../../../context/SocketContext';
 import EmojiPicker from 'emoji-picker-react';
@@ -36,6 +36,18 @@ export default function ChatSection({ preselectedUser = null }) {
   const messagesEndRef = useRef(null);
   const currentUser = JSON.parse(localStorage.getItem('placifyUser')) || {};
   const token = localStorage.getItem('placifyToken');
+
+  const normalizeUserId = (value) => String(value || '').trim();
+
+  const onlineUserSet = useMemo(() => {
+    return new Set((onlineUsers || []).map((id) => normalizeUserId(id)).filter(Boolean));
+  }, [onlineUsers]);
+
+  const isUserOnline = (user) => {
+    const userId = normalizeUserId(user?._id || user?.id || user?.userId);
+    if (!userId) return Boolean(user?.isOnline);
+    return onlineUserSet.has(userId) || Boolean(user?.isOnline);
+  };
 
   // Fetch all users on mount
   const fetchUsers = React.useCallback(async () => {
@@ -236,24 +248,74 @@ export default function ChatSection({ preselectedUser = null }) {
     }
   };
 
-  const handleBlockUser = async () => {
-    if (!selectedUser) return;
-    const isBlocked = selectedUser.isBlocked;
+  const handleBlockUserById = async (targetUserId, currentlyBlocked = false) => {
+    if (!targetUserId) return;
+    const isBlocked = Boolean(currentlyBlocked);
     const action = isBlocked ? 'unblock' : 'block';
     
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/users/${action}/${selectedUser._id}`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/users/${action}/${targetUserId}`, {
         method: 'PATCH',
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
-        setSelectedUser(prev => ({ ...prev, isBlocked: !isBlocked }));
-        fetchUsers(); // Refresh contacts
+        setSelectedUser(prev => prev && normalizeUserId(prev._id) === normalizeUserId(targetUserId)
+          ? { ...prev, isBlocked: !isBlocked }
+          : prev
+        );
+        setViewingProfile(prev => prev && normalizeUserId(prev._id || prev.id || prev.userId) === normalizeUserId(targetUserId)
+          ? { ...prev, isBlocked: !isBlocked }
+          : prev
+        );
+        setUsers(prev => prev.map(user => normalizeUserId(user._id) === normalizeUserId(targetUserId)
+          ? { ...user, isBlocked: !isBlocked }
+          : user
+        ));
+        fetchUsers();
         setShowOptionsDropdown(false);
       }
     } catch (err) {
       console.error(`${action} failed:`, err);
     }
+  };
+
+  const handleBlockUser = async () => {
+    if (!selectedUser) return;
+    await handleBlockUserById(selectedUser._id, selectedUser.isBlocked);
+  };
+
+  const handleCopyToClipboard = async (value, label) => {
+    if (!value) {
+      window.alert(`${label} is not available for this profile.`);
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(String(value));
+      window.alert(`${label} copied successfully.`);
+    } catch (err) {
+      console.error('Copy failed:', err);
+      window.alert(`Could not copy ${label.toLowerCase()}.`);
+    }
+  };
+
+  const handleReportUser = (user) => {
+    const userId = user?._id || user?.id || user?.userId;
+    const userName = user?.name || 'Unknown user';
+    if (!userId) {
+      window.alert('Unable to report this user right now.');
+      return;
+    }
+
+    const reason = window.prompt('Report reason (required):');
+    if (!reason || !reason.trim()) return;
+
+    const subject = encodeURIComponent(`Placify report for ${userName}`);
+    const body = encodeURIComponent(
+      `Please review this user report.\n\nReported user: ${userName}\nUser ID: ${userId}\nReason: ${reason.trim()}\nReported at: ${new Date().toISOString()}`
+    );
+
+    window.location.href = `mailto:placify.support@gmail.com?subject=${subject}&body=${body}`;
+    window.alert('Report draft opened in your email app.');
   };
 
   const handleViewProfile = (user) => {
@@ -344,7 +406,7 @@ export default function ChatSection({ preselectedUser = null }) {
                   }`}>
                     {user.avatar ? <img src={user.avatar} alt={user.name} className="w-full h-full rounded-[14px] sm:rounded-2xl object-cover" /> : user.name.charAt(0).toUpperCase()}
                   </div>
-                  {onlineUsers.includes(user._id) && (
+                  {isUserOnline(user) && (
                     <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 sm:w-4 sm:h-4 bg-emerald-500 border-2 border-[#111111] rounded-full shadow-lg" />
                   )}
                 </div>
@@ -424,16 +486,19 @@ export default function ChatSection({ preselectedUser = null }) {
                 <div>
                   <h3 className="text-base sm:text-lg font-bold text-white tracking-tight leading-none mb-1.5">{selectedUser.name}</h3>
                   <div className="flex items-center gap-2">
-                    <span className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${onlineUsers.includes(selectedUser._id) ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-slate-600'}`}></span>
-                    <p className={`text-[9px] sm:text-[11px] font-bold uppercase tracking-widest ${onlineUsers.includes(selectedUser._id) ? 'text-emerald-400' : 'text-[#5C5550]'}`}>
-                      {onlineUsers.includes(selectedUser._id) ? 'ACTIVE NOW' : 'OFFLINE'}
+                    <span className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${isUserOnline(selectedUser) ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-slate-600'}`}></span>
+                    <p className={`text-[9px] sm:text-[11px] font-bold uppercase tracking-widest ${isUserOnline(selectedUser) ? 'text-emerald-400' : 'text-[#5C5550]'}`}>
+                      {isUserOnline(selectedUser) ? 'ACTIVE NOW' : 'OFFLINE'}
                     </p>
                   </div>
                 </div>
               </div>
               
               <div className="flex items-center gap-2">
-                <button className="text-[#A89E94] hover:text-[#FF6B35] p-2.5 rounded-xl hover:bg-[#FF6B35]/10 transition-all">
+                <button
+                  onClick={() => handleViewProfile(selectedUser)}
+                  className="text-[#A89E94] hover:text-[#FF6B35] p-2.5 rounded-xl hover:bg-[#FF6B35]/10 transition-all"
+                >
                   <Info size={20} />
                 </button>
                 <div className="relative">
@@ -656,13 +721,17 @@ export default function ChatSection({ preselectedUser = null }) {
                  }`}>
                    {viewingProfile.avatar ? <img src={viewingProfile.avatar} alt="Profile" className="w-full h-full object-cover" /> : viewingProfile.name?.charAt(0).toUpperCase()}
                  </div>
-                 {onlineUsers.includes(viewingProfile._id) && (
+                 {isUserOnline(viewingProfile) && (
                    <div className="absolute bottom-2 right-2 sm:bottom-4 sm:right-4 w-4 h-4 sm:w-6 sm:h-6 bg-emerald-500 border-2 sm:border-4 border-[#111111] rounded-full shadow-xl" />
                  )}
                </div>
                
-               <h3 className="text-3xl font-black font-['Syne'] text-white mb-2 text-center tracking-tight">{viewingProfile.name}</h3>
-               <div className="px-4 py-1.5 bg-[#FF6B35]/10 border border-[#FF6B35]/20 rounded-full mb-8">
+               <h3 className="text-2xl sm:text-[32px] leading-tight font-extrabold font-['DM_Sans'] text-white mb-2 text-center tracking-tight break-words max-w-full">{viewingProfile.name}</h3>
+               <p className="text-xs font-bold uppercase tracking-[0.2em] mb-5 flex items-center gap-2 text-center">
+                 <span className={`w-2.5 h-2.5 rounded-full ${isUserOnline(viewingProfile) ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.45)]' : 'bg-slate-600'}`}></span>
+                 <span className={isUserOnline(viewingProfile) ? 'text-emerald-400' : 'text-[#A89E94]'}>{isUserOnline(viewingProfile) ? 'ONLINE' : 'OFFLINE'}</span>
+               </p>
+               <div className="px-4 py-1.5 bg-[#FF6B35]/10 border border-[#FF6B35]/20 rounded-full mb-6">
                  <p className="text-[#FF6B35] text-[10px] font-['JetBrains_Mono']s font-black uppercase tracking-widest">{viewingProfile.role || 'PLACIFY MEMBER'}</p>
                </div>
 
@@ -670,14 +739,41 @@ export default function ChatSection({ preselectedUser = null }) {
                   <div className="w-full bg-[#1C1C1C]/50 backdrop-blur-sm rounded-[32px] p-6 border border-[#2A2520] shadow-inner">
                     <p className="text-[10px] text-[#FF6B35] font-black uppercase tracking-[0.2em] mb-3">Professional Contact</p>
                     <div className="space-y-4">
-                      <div className="flex items-center justify-between group cursor-pointer">
-                        <span className="text-sm font-['DM_Sans'] text-[#A89E94] font-medium">Email Address</span>
-                        <span className="text-sm font-['DM_Sans'] text-[#F5F0EB] font-bold group-hover:text-[#FF6B35] transition-colors">{viewingProfile.email || 'Restricted'}</span>
+                      <div className="flex items-start justify-between gap-3 group">
+                        <span className="text-base leading-tight font-['DM_Sans'] text-[#A89E94] font-medium">Email</span>
+                        <span className="text-base leading-tight text-right break-all font-['DM_Sans'] text-[#F5F0EB] font-semibold group-hover:text-[#FF6B35] transition-colors">{viewingProfile.email || 'Restricted'}</span>
                       </div>
+                      {viewingProfile.email && (
+                        <div className="grid grid-cols-2 gap-3">
+                          <button
+                            onClick={() => window.open(`mailto:${viewingProfile.email}`, '_blank', 'noopener,noreferrer')}
+                            className="py-2.5 rounded-xl bg-[#111111] border border-[#2A2520] text-[#F5F0EB] text-xs font-bold uppercase tracking-wider hover:bg-[#FF6B35]/10 hover:text-[#FF6B35] transition-all flex items-center justify-center gap-2"
+                          >
+                            <Mail size={14} /> Email
+                          </button>
+                          <button
+                            onClick={() => handleCopyToClipboard(viewingProfile.email, 'Email')}
+                            className="py-2.5 rounded-xl bg-[#111111] border border-[#2A2520] text-[#F5F0EB] text-xs font-bold uppercase tracking-wider hover:bg-[#FF6B35]/10 hover:text-[#FF6B35] transition-all flex items-center justify-center gap-2"
+                          >
+                            <Copy size={14} /> Copy
+                          </button>
+                        </div>
+                      )}
                       <div className="h-px bg-white/5"></div>
-                      <div className="flex items-center justify-between group cursor-pointer">
-                        <span className="text-sm font-['DM_Sans'] text-[#A89E94] font-medium">Network ID</span>
-                        <span className="text-[11px] font-mono text-[#5C5550] font-bold uppercase">{viewingProfile._id?.slice(-8)}</span>
+                      <div className="flex items-center justify-between gap-3 group">
+                        <span className="text-base font-['DM_Sans'] text-[#A89E94] font-medium">Network ID</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-mono text-[#8D837A] font-bold uppercase">{viewingProfile._id?.slice(-8) || 'N/A'}</span>
+                          {viewingProfile._id && (
+                            <button
+                              onClick={() => handleCopyToClipboard(viewingProfile._id, 'Network ID')}
+                              className="p-1.5 rounded-lg bg-[#111111] border border-[#2A2520] text-[#A89E94] hover:text-[#FF6B35] hover:border-[#FF6B35]/40 transition-all"
+                              aria-label="Copy Network ID"
+                            >
+                              <Copy size={13} />
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -700,13 +796,27 @@ export default function ChatSection({ preselectedUser = null }) {
                   )}
                </div>
 
-               <div className="w-full grid grid-cols-2 gap-4 mt-auto">
-                  <button className="py-4 bg-[#111111] hover:bg-red-500/10 rounded-2xl text-red-400 text-[10px] font-['JetBrains_Mono']s font-black flex items-center justify-center gap-3 transition-all border border-[#2A2520] uppercase tracking-widest active:scale-95">
-                    <UserX size={18} /> Block
-                  </button>
-                  <button className="py-4 bg-[#111111] hover:bg-orange-500/10 rounded-2xl text-orange-400 text-[10px] font-['JetBrains_Mono']s font-black flex items-center justify-center gap-3 transition-all border border-[#2A2520] uppercase tracking-widest active:scale-95">
-                    <ThumbsUp size={18} /> Report
-                  </button>
+               <div className="w-full space-y-2 mt-auto">
+                  {(viewingProfile._id && normalizeUserId(viewingProfile._id) !== normalizeUserId(currentUser.id)) ? (
+                    <div className="w-full grid grid-cols-2 gap-4">
+                      <button
+                        onClick={() => handleBlockUserById(viewingProfile._id, viewingProfile.isBlocked)}
+                        className="py-4 bg-[#111111] hover:bg-red-500/10 rounded-2xl text-red-400 text-[10px] font-['JetBrains_Mono']s font-black flex items-center justify-center gap-3 transition-all border border-[#2A2520] uppercase tracking-widest active:scale-95"
+                      >
+                        <UserX size={18} /> {viewingProfile.isBlocked ? 'Unblock' : 'Block'}
+                      </button>
+                      <button
+                        onClick={() => handleReportUser(viewingProfile)}
+                        className="py-4 bg-[#111111] hover:bg-orange-500/10 rounded-2xl text-orange-400 text-[10px] font-['JetBrains_Mono']s font-black flex items-center justify-center gap-3 transition-all border border-[#2A2520] uppercase tracking-widest active:scale-95"
+                      >
+                        <AlertTriangle size={18} /> Report
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="w-full rounded-2xl border border-[#2A2520] bg-[#1C1C1C]/50 px-4 py-3 text-center text-xs font-semibold text-[#A89E94]">
+                      This is your profile. Community moderation actions are hidden.
+                    </div>
+                  )}
                </div>
             </div>
           </div>

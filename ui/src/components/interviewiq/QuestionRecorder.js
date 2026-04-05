@@ -15,12 +15,51 @@ export default function QuestionRecorder({ question, onRecorded, onError }) {
   const videoRef = useRef(null);
   const streamRef = useRef(null);
 
+  const getRecorderConfig = () => {
+    const candidateTypes = [
+      'video/webm;codecs=vp9,opus',
+      'video/webm;codecs=vp8,opus',
+      'video/webm',
+    ];
+
+    const supportedType = candidateTypes.find((type) => {
+      try {
+        return typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported(type);
+      } catch (_err) {
+        return false;
+      }
+    });
+
+    const config = {
+      videoBitsPerSecond: 220000,
+      audioBitsPerSecond: 48000,
+    };
+
+    if (supportedType) {
+      config.mimeType = supportedType;
+    }
+
+    return config;
+  };
+
   useEffect(() => {
     let mounted = true;
 
     const setup = async () => {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            width: { ideal: 640 },
+            height: { ideal: 360 },
+            frameRate: { ideal: 15, max: 24 },
+          },
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            channelCount: 1,
+            sampleRate: 16000,
+          },
+        });
         if (!mounted) return;
 
         streamRef.current = stream;
@@ -64,7 +103,14 @@ export default function QuestionRecorder({ question, onRecorded, onError }) {
     if (phase !== 'recording' || !streamRef.current) return undefined;
 
     stopRequestedRef.current = false;
-    const recorder = new MediaRecorder(streamRef.current, { mimeType: 'video/webm;codecs=vp8,opus' });
+    let recorder;
+    try {
+      recorder = new MediaRecorder(streamRef.current, getRecorderConfig());
+    } catch (error) {
+      onError?.('Unable to start recording on this browser. Please refresh and try again.');
+      setPhase('prep');
+      return undefined;
+    }
     chunksRef.current = [];
 
     const stopRecorder = () => {
@@ -83,7 +129,7 @@ export default function QuestionRecorder({ question, onRecorded, onError }) {
     };
 
     recorder.onstop = () => {
-      const blob = new Blob(chunksRef.current, { type: 'video/webm' });
+      const blob = new Blob(chunksRef.current, { type: recorder.mimeType || 'video/webm' });
       if (streamRef.current) {
         streamRef.current.getTracks().forEach((track) => track.stop());
       }
@@ -111,7 +157,7 @@ export default function QuestionRecorder({ question, onRecorded, onError }) {
         recorder.stop();
       }
     };
-  }, [phase, onRecorded]);
+  }, [phase, onRecorded, onError]);
 
   const timerLabel = useMemo(() => {
     if (phase === 'prep') return `Preparation: ${prepSeconds}s`;

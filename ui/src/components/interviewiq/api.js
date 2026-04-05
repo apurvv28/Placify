@@ -7,7 +7,15 @@ const authHeaders = () => ({
 });
 
 const fetchJson = async (url, options = {}) => {
-  const response = await fetch(url, options);
+  let response;
+  try {
+    response = await fetch(url, options);
+  } catch (error) {
+    if (error?.name === 'TypeError') {
+      throw new Error('Network upload failed. Please check your connection and try a shorter recording.');
+    }
+    throw error;
+  }
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
     const message = data?.message || 'Request failed';
@@ -25,6 +33,16 @@ export const interviewIqApi = {
       headers: authHeaders(),
     }),
   uploadResponse: ({ recordingBlob, questionId, deckId, deckNumber, transcriptHint = '' }) => {
+    if (!recordingBlob || recordingBlob.size <= 0) {
+      throw new Error('Recording is empty. Please allow camera/microphone access and record again.');
+    }
+
+    // Guard against common serverless payload limits that surface as browser-level "Failed to fetch".
+    const maxSafeUploadBytes = 7 * 1024 * 1024;
+    if (recordingBlob.size > maxSafeUploadBytes) {
+      throw new Error('Recording is too large to upload. Please finish your answer a bit earlier and retry.');
+    }
+
     const formData = new FormData();
     formData.append('recording', recordingBlob, `response-${Date.now()}.webm`);
     formData.append('questionId', questionId);
