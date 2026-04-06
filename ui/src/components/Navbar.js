@@ -2,6 +2,13 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, X, Zap } from 'lucide-react';
 
+const STATIC_NAV_LINKS = [
+  { label: 'Features', to: '/features' },
+  { label: 'About', to: '/about' },
+  { label: 'Contact', to: '/contact' },
+  { label: 'Help', to: '/help' },
+];
+
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -29,14 +36,14 @@ export default function Navbar() {
           {/* Desktop nav links */}
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-6">
-              {['Features', 'Testimonials', 'Contact'].map((item) => (
+              {STATIC_NAV_LINKS.map((item) => (
                 <Link
-                  key={item}
-                  to={`/${item.toLowerCase()}`}
+                  key={item.label}
+                  to={item.to}
                   className="relative group text-[#A89E94] hover:text-[#F5F0EB] transition-colors duration-200 px-2 py-2 text-sm font-medium"
                   style={{ textDecoration: 'none', fontFamily: 'DM Sans, sans-serif' }}
                 >
-                  <span className="relative z-10">{item}</span>
+                  <span className="relative z-10">{item.label}</span>
                   <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-[#FF6B35] group-hover:w-full transition-all duration-300 ease-out" />
                 </Link>
               ))}
@@ -71,16 +78,16 @@ export default function Navbar() {
       {isOpen && (
         <div className="md:hidden bg-[#0A0A0A]/70 backdrop-blur-3xl border-b border-[#2A2520] absolute w-full shadow-2xl">
           <div className="px-4 pt-2 pb-6 space-y-1">
-            {['Features', 'Testimonials', 'Contact'].map((item) => (
+            {STATIC_NAV_LINKS.map((item) => (
               <Link
-                key={item}
-                to={`/${item.toLowerCase()}`}
+                key={item.label}
+                to={item.to}
                 onClick={closeMenu}
                 className="relative group block text-[#A89E94] hover:text-[#F5F0EB] transition-colors duration-200 px-3 py-3 rounded-lg text-base font-medium overflow-hidden"
                 style={{ textDecoration: 'none' }}
               >
                 <span className="relative z-10 flex items-center gap-2 group-hover:translate-x-1 transition-transform duration-200">
-                  {item}
+                  {item.label}
                 </span>
                 <span className="absolute left-0 top-0 w-[2px] h-full bg-[#FF6B35] scale-y-0 group-hover:scale-y-100 transition-transform duration-200 origin-top" />
               </Link>

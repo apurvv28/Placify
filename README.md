@@ -35,6 +35,14 @@
 
 **Placify** is a comprehensive, AI-integrated placement preparation and networking platform. Designed specifically for students and recruiters, Placify seamlessly integrates real-time communications, automated resume analysis via Google Gemini and Groq, an advanced AI chatbot, and a robust community networking feed.
 
+## 📚 Project Documentation Index
+
+Use the focused documentation files below for deep technical and theoretical understanding:
+
+- [Project Impact And Theory](docs/01-Project-Impact-And-Theory.md)
+- [Architecture And System Flow](docs/02-Architecture-And-System-Flow.md)
+- [Technical Stack, AWS Stack, And Open-Source Stack](docs/03-Technical-Stack-AWS-And-Open-Source.md)
+
 ## 🎯 New Feature: InterviewIQ (AI Mock Interview Engine)
 
 Placify now includes **InterviewIQ**, a deck-based mock interview system with a resilient **3-model evaluation pipeline**:

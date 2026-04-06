@@ -4,8 +4,12 @@ import LandingPage from './components/LandingPage';
 import AuthFlipPage from './components/auth/AuthFlipPage';
 import DashboardPage from './components/dashboard/DashboardPage';
 import Features from './components/pages/Features';
-import Testimonials from './components/pages/Testimonials';
 import Contact from './components/pages/Contact';
+import About from './components/pages/About';
+import Help from './components/pages/Help';
+import PrivacyPolicy from './components/pages/PrivacyPolicy';
+import TermsAndConditions from './components/pages/TermsAndConditions';
+import AtsAlgorithmCriteria from './components/pages/AtsAlgorithmCriteria';
 import InterviewIQDashboardPage from './components/interviewiq/InterviewIQDashboardPage';
 import InterviewIQDeckSessionPage from './components/interviewiq/InterviewIQDeckSessionPage';
 import InterviewIQHistoryPage from './components/interviewiq/InterviewIQHistoryPage';
@@ -33,8 +37,15 @@ function App() {
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/features" element={<Features />} />
-          <Route path="/testimonials" element={<Testimonials />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/contacts" element={<Contact />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/help" element={<Help />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+          <Route path="/tnc" element={<TermsAndConditions />} />
+          <Route path="/ats-algorithm-criteria" element={<AtsAlgorithmCriteria />} />
+          <Route path="/ats-criteria" element={<AtsAlgorithmCriteria />} />
           <Route path="/auth" element={<AuthFlipPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/interviewiq" element={<InterviewIQDashboardPage />} />

@@ -3,9 +3,19 @@ import { Github, Twitter, Linkedin, Mail, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const footerLinks = {
-  Terminal: ['Features', 'Pricing', 'ATS Algorithm', 'API Access'],
-  Company: ['About Placify', 'Manifesto', 'Careers', 'Brand Kit'],
-  Legal: ['Help Center', 'Contact', 'Privacy Policy', 'Terms of Service'],
+  Product: [
+    { label: 'Features', to: '/features' },
+    { label: 'ATS Algorithm / Criteria', to: '/ats-algorithm-criteria' },
+    { label: 'Help', to: '/help' },
+  ],
+  Company: [
+    { label: 'About', to: '/about' },
+    { label: 'Contact', to: '/contact' },
+  ],
+  Legal: [
+    { label: 'Privacy Policy', to: '/privacy-policy' },
+    { label: 'Terms & Conditions', to: '/terms-and-conditions' },
+  ],
 };
 
 export default function Footer() {
@@ -24,7 +34,7 @@ export default function Footer() {
               <span className="text-2xl font-black tracking-tighter" style={{ color: '#F5F0EB', fontFamily: 'Syne, sans-serif' }}>PLACIFY</span>
             </Link>
             <p className="text-sm mt-5 leading-relaxed font-medium" style={{ color: '#A89E94', fontFamily: 'DM Sans, sans-serif' }}>
-              The definitive platform for strategic career acceleration. Professional tools engineered for serious candidates.
+              Placify is free and open source. Build better resumes and interview readiness with transparent, community-driven tools.
             </p>
           </div>
 
@@ -48,13 +58,12 @@ export default function Footer() {
               <h4 className="text-sm font-bold uppercase tracking-widest mb-6" style={{ color: '#F5F0EB', fontFamily: 'JetBrains Mono, monospace' }}>{category}</h4>
               <ul className="space-y-4 m-0 p-0 list-none">
                 {links.map((link) => {
-                  const linkPath = `/${link.toLowerCase().replace(/\s+/g, '-')}`;
                   return (
-                    <li key={link}>
-                      <Link to={linkPath} className="text-sm font-medium transition-colors" style={{ color: '#A89E94', textDecoration: 'none', fontFamily: 'DM Sans, sans-serif' }}
+                    <li key={link.label}>
+                      <Link to={link.to} className="text-sm font-medium transition-colors" style={{ color: '#A89E94', textDecoration: 'none', fontFamily: 'DM Sans, sans-serif' }}
                         onMouseEnter={e => e.currentTarget.style.color = '#FF6B35'}
                         onMouseLeave={e => e.currentTarget.style.color = '#A89E94'}
-                      >{link}</Link>
+                      >{link.label}</Link>
                     </li>
                   );
                 })}
@@ -88,7 +97,7 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row justify-between items-center text-xs font-bold tracking-widest uppercase pt-8" style={{ color: '#5C5550', fontFamily: 'JetBrains Mono, monospace', borderTop: '1px solid #1C1C1C' }}>
           <p>© {new Date().getFullYear()} Placify Technologies. All rights reserved.</p>
           <div className="flex gap-6 mt-4 md:mt-0 pb-4">
-            <span style={{ color: '#A89E94' }}>SysStatus: <span style={{ color: '#22c55e' }}>Operational</span></span>
+            <span style={{ color: '#A89E94' }}>License: <span style={{ color: '#22c55e' }}>Open Source</span></span>
           </div>
         </div>
       </div>

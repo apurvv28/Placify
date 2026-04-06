@@ -23,9 +23,23 @@ const corsOrigins = process.env.CLIENT_ORIGIN
       'https://placify-294zb9z4r-apurv-saktepars-projects.vercel.app',
     ];
 
+const isAllowedOrigin = (origin) => {
+  if (!origin) return true;
+  if (corsOrigins.includes(origin)) return true;
+  if (/^https:\/\/[a-z0-9-]+(?:\.[a-z0-9-]+)*\.vercel\.app$/i.test(origin)) return true;
+  if (/^https?:\/\/localhost:\d+$/i.test(origin)) return true;
+  return false;
+};
+
 app.use(
   cors({
-    origin: corsOrigins,
+    origin: (origin, callback) => {
+      if (isAllowedOrigin(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error(`CORS blocked for origin: ${origin}`));
+    },
     credentials: true,
   })
 );
