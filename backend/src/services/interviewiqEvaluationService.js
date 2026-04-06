@@ -5,7 +5,6 @@ const { spawn } = require('child_process');
 const { randomUUID } = require('crypto');
 const { S3Client, GetObjectCommand, PutObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
 const { TranscribeClient, StartTranscriptionJobCommand, GetTranscriptionJobCommand } = require('@aws-sdk/client-transcribe');
-const { BedrockRuntimeClient, ConverseCommand } = require('@aws-sdk/client-bedrock-runtime');
 const InterviewIQResponseRepository = require('../repositories/InterviewIQResponseRepository');
 const { interviewRecordingBucket } = require('../config/interviewiqS3');
 
@@ -36,9 +35,20 @@ if (accessKeyId && secretAccessKey) {
 
 const s3Client = new S3Client(awsClientConfig);
 const transcribeClient = new TranscribeClient(awsClientConfig);
-const bedrockRuntimeClient = new BedrockRuntimeClient(awsClientConfig);
 
 const FILLER_WORDS = ['um', 'uh', 'like', 'you know', 'basically'];
+const strictEvaluationEnabled = getEnv('INTERVIEWIQ_STRICT_EVALUATION', 'true').toLowerCase() !== 'false';
+const GROQ_CHAT_URL = 'https://api.groq.com/openai/v1/chat/completions';
+const GROQ_TRANSCRIBE_URL = 'https://api.groq.com/openai/v1/audio/transcriptions';
+
+const logEval = (responseId, message, details = null) => {
+  const prefix = `[InterviewIQ Evaluation][response:${responseId}] ${message}`;
+  if (details === null || details === undefined) {
+    console.log(prefix);
+    return;
+  }
+  console.log(prefix, details);
+};
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
@@ -71,6 +81,14 @@ const streamToBuffer = async (stream) => {
     chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
   }
   return Buffer.concat(chunks);
+};
+
+const getGroqApiKey = () => {
+  const apiKey = getEnv('GROQ_API_KEY', '');
+  if (!apiKey || apiKey === 'your_groq_api_key_here') {
+    throw new Error('GROQ_API_KEY is not configured.');
+  }
+  return apiKey;
 };
 
 const tokenize = (text) =>
@@ -160,6 +178,12 @@ const getTranscriptFromTranscribe = async ({ s3Key }) => {
   const transcriptionJobName = `interviewiq-${Date.now()}-${randomUUID().slice(0, 8)}`;
   const mediaUri = `s3://${interviewRecordingBucket}/${s3Key}`;
 
+  console.log('[InterviewIQ Evaluation][transcribe] Starting transcription job', {
+    transcriptionJobName,
+    s3Key,
+    mediaUri,
+  });
+
   await transcribeClient.send(
     new StartTranscriptionJobCommand({
       TranscriptionJobName: transcriptionJobName,
@@ -194,10 +218,18 @@ const getTranscriptFromTranscribe = async ({ s3Key }) => {
 
       const transcriptJson = await fileResponse.json();
       const transcriptText = transcriptJson?.results?.transcripts?.[0]?.transcript || '';
+      console.log('[InterviewIQ Evaluation][transcribe] Transcription completed', {
+        transcriptionJobName,
+        transcriptLength: transcriptText.length,
+      });
       return transcriptText;
     }
 
     if (status === 'FAILED') {
+      console.error('[InterviewIQ Evaluation][transcribe] Transcription failed', {
+        transcriptionJobName,
+        reason: job?.FailureReason || 'unknown',
+      });
       throw new Error(job?.FailureReason || 'Amazon Transcribe job failed');
     }
 
@@ -207,52 +239,125 @@ const getTranscriptFromTranscribe = async ({ s3Key }) => {
   throw new Error('Amazon Transcribe timed out');
 };
 
-const getLLMAnalysisFromBedrock = async ({ transcriptText, questionType }) => {
-  const modelId = getEnv('INTERVIEWIQ_BEDROCK_MODEL_ID', 'amazon.nova-micro-v1:0');
-  const maxTokens = Number(getEnv('INTERVIEWIQ_BEDROCK_MAX_TOKENS', '512'));
+const getTranscriptFromGroqAudio = async ({ s3Key }) => {
+  const modelName = getEnv('INTERVIEWIQ_GROQ_TRANSCRIBE_MODEL', 'whisper-large-v3-turbo');
+  const apiKey = getGroqApiKey();
 
-  const systemPrompt = [
-    'You are an expert HR evaluator.',
-    'Score this interview response on: clarity (0-25), relevance (0-25), depth (0-25), communication (0-25).',
-    'For behavioral questions also score STAR structure adherence (bonus 0-10).',
-    'Return strict JSON with fields:',
-    '{ clarity, relevance, depth, communication, starScore, overallFeedback, strengths, improvements, fillerWordCount }',
-  ].join(' ');
+  console.log('[InterviewIQ Evaluation][groq-transcribe] Starting Groq transcription', {
+    modelName,
+    s3Key,
+  });
 
-  const response = await bedrockRuntimeClient.send(
-    new ConverseCommand({
-      modelId,
-      system: [{ text: systemPrompt }],
-      messages: [
-        {
-          role: 'user',
-          content: [
-            {
-              text: `Question type: ${questionType}\nTranscript:\n${transcriptText}`,
-            },
-          ],
-        },
-      ],
-      inferenceConfig: {
-        maxTokens,
-        temperature: 0.1,
-      },
+  const objectResponse = await s3Client.send(
+    new GetObjectCommand({
+      Bucket: interviewRecordingBucket,
+      Key: s3Key,
     })
   );
 
-  const outputText =
-    response?.output?.message?.content
-      ?.map((item) => item?.text || '')
-      .join('\n') || '';
+  const mediaBuffer = await streamToBuffer(objectResponse.Body);
+  const ext = String(path.extname(s3Key || '') || '.webm').replace('.', '') || 'webm';
+  const mimeType = ext === 'mp4' ? 'video/mp4' : ext === 'mov' ? 'video/quicktime' : 'video/webm';
+  const fileName = `recording.${ext}`;
+
+  const formData = new FormData();
+  formData.append('file', new Blob([mediaBuffer], { type: mimeType }), fileName);
+  formData.append('model', modelName);
+  formData.append('temperature', '0');
+
+  const response = await fetch(GROQ_TRANSCRIBE_URL, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: formData,
+  });
+
+  const payload = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    const errText = String(payload?.error?.message || payload?.error || `HTTP ${response.status}`);
+    throw new Error(`Groq transcription failed: ${errText}`);
+  }
+
+  const transcriptText = String(payload?.text || '').trim();
+
+  console.log('[InterviewIQ Evaluation][groq-transcribe] Groq transcription completed', {
+    transcriptLength: transcriptText.length,
+  });
+
+  return transcriptText;
+};
+
+const getLLMAnalysisFromGroqLlama = async ({ transcriptText, questionType }) => {
+  const modelId = getEnv('INTERVIEWIQ_GROQ_MODEL', 'llama-3.3-70b-versatile');
+  const maxTokens = Number(getEnv('INTERVIEWIQ_GROQ_MAX_TOKENS', '512'));
+  const apiKey = getGroqApiKey();
+
+  console.log('[InterviewIQ Evaluation][groq-llama] Starting strict star rating evaluation', {
+    modelId,
+    questionType,
+    transcriptLength: String(transcriptText || '').length,
+    strictEvaluationEnabled,
+  });
+
+  const systemPrompt = [
+    'You are an expert HR evaluator.',
+    'Use strict grading standards and be conservative with high ratings.',
+    'Score the response with a single starRating from 0 to 10 (can include one decimal place).',
+    'A score of 10 should be extremely rare and reserved for exceptional answers.',
+    'Question type context is provided. For behavioral answers, enforce STAR completeness in the rating.',
+    'Return strict JSON with fields:',
+    '{ starRating, overallFeedback, strengths, improvements, fillerWordCount }',
+    'Do not include any additional fields.',
+  ].join(' ');
+
+  const payload = {
+    model: modelId,
+    messages: [
+      { role: 'system', content: systemPrompt },
+      {
+        role: 'user',
+        content: `Question type: ${questionType}\nTranscript:\n${transcriptText}`,
+      },
+    ],
+    temperature: 0,
+    max_tokens: maxTokens,
+  };
+
+  const response = await fetch(GROQ_CHAT_URL, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const errText = String(data?.error?.message || data?.error || `HTTP ${response.status}`);
+    throw new Error(`Groq chat completion failed: ${errText}`);
+  }
+
+  const outputText = String(data?.choices?.[0]?.message?.content || '');
 
   const parsedOutput = extractJsonObject(outputText) || {};
 
+  const parsedStarRating = Number(parsedOutput.starRating);
+  if (!Number.isFinite(parsedStarRating)) {
+    console.error('[InterviewIQ Evaluation][groq-llama] Invalid or missing starRating in model output', {
+      rawOutputPreview: String(outputText || '').slice(0, 400),
+    });
+    throw new Error('Groq response missing valid starRating.');
+  }
+
+  console.log('[InterviewIQ Evaluation][groq-llama] Evaluation succeeded', {
+    starRating: parsedStarRating,
+  });
+
   return {
-    clarity: clamp(Number(parsedOutput.clarity || 0), 0, 25),
-    relevance: clamp(Number(parsedOutput.relevance || 0), 0, 25),
-    depth: clamp(Number(parsedOutput.depth || 0), 0, 25),
-    communication: clamp(Number(parsedOutput.communication || 0), 0, 25),
-    starScore: questionType === 'behavioral' ? clamp(Number(parsedOutput.starScore || 0), 0, 10) : 0,
+    starRating: clamp(Math.round(parsedStarRating * 10) / 10, 0, 10),
     overallFeedback: String(parsedOutput.overallFeedback || 'Evaluation completed.'),
     strengths: Array.isArray(parsedOutput.strengths) ? parsedOutput.strengths.map(String) : [],
     improvements: Array.isArray(parsedOutput.improvements) ? parsedOutput.improvements.map(String) : [],
@@ -268,11 +373,7 @@ const getModel1TranscriptAndLLM = async ({ transcriptText, questionType }) => {
 
   if (!wordCount) {
     return {
-      clarity: 0,
-      relevance: 0,
-      depth: 0,
-      communication: 0,
-      starScore: 0,
+      starRating: 0,
       overallFeedback: 'Transcript unavailable. Score could not be fully evaluated.',
       strengths: [],
       improvements: ['Please ensure microphone permissions and AWS transcription availability.'],
@@ -283,24 +384,22 @@ const getModel1TranscriptAndLLM = async ({ transcriptText, questionType }) => {
     };
   }
 
-  const clarity = clamp(Math.round(Math.min(25, wordCount / 8) - fillerWordCount * 0.3), 0, 25);
-  const relevance = clamp(Math.round(Math.min(25, wordCount / 10) + 5), 0, 25);
-  const depth = clamp(Math.round(Math.min(25, wordCount / 12) + 4), 0, 25);
-  const communication = clamp(Math.round(Math.min(25, wordCount / 9) - fillerWordCount * 0.2), 0, 25);
+  const clarity = clamp(Math.min(2.5, wordCount / 35) - fillerWordCount * 0.06, 0, 2.5);
+  const relevance = clamp(Math.min(2.5, wordCount / 45) + 0.5, 0, 2.5);
+  const depth = clamp(Math.min(2.5, wordCount / 55) + 0.4, 0, 2.5);
+  const communication = clamp(Math.min(2.5, wordCount / 40) - fillerWordCount * 0.05, 0, 2.5);
 
   const hasSituation = /\bsituation\b/i.test(transcriptText);
   const hasTask = /\btask\b/i.test(transcriptText);
   const hasAction = /\baction\b/i.test(transcriptText);
   const hasResult = /\bresult\b/i.test(transcriptText);
-  const starScore =
-    questionType === 'behavioral' ? [hasSituation, hasTask, hasAction, hasResult].filter(Boolean).length * 2.5 : 0;
+  const behavioralBonus =
+    questionType === 'behavioral' ? [hasSituation, hasTask, hasAction, hasResult].filter(Boolean).length * 0.625 : 0;
+
+  const starRating = clamp(Math.round((clarity + relevance + depth + communication + behavioralBonus) * 10) / 10, 0, 10);
 
   return {
-    clarity,
-    relevance,
-    depth,
-    communication,
-    starScore,
+    starRating,
     overallFeedback: 'Automated baseline feedback generated from transcript quality signals.',
     strengths: ['Structure is understandable', 'Core points are communicated'],
     improvements: ['Use fewer filler words', 'Add quantified results where possible'],
@@ -316,8 +415,21 @@ const getModel1TranscriptAndLLMReal = async ({ s3Key, transcriptHint, questionTy
 
   try {
     transcriptText = await getTranscriptFromTranscribe({ s3Key });
-  } catch {
-    transcriptText = transcriptHint || '';
+  } catch (error) {
+    console.warn('[InterviewIQ Evaluation][pipeline] Transcribe unavailable, falling back to transcriptHint', {
+      s3Key,
+      reason: error.message || 'unknown',
+    });
+
+    try {
+      transcriptText = await getTranscriptFromGroqAudio({ s3Key });
+    } catch (groqTranscribeError) {
+      console.warn('[InterviewIQ Evaluation][pipeline] Groq transcription unavailable, falling back to transcriptHint', {
+        s3Key,
+        reason: groqTranscribeError.message || 'unknown',
+      });
+      transcriptText = transcriptHint || '';
+    }
   }
 
   if (!transcriptText) {
@@ -329,25 +441,34 @@ const getModel1TranscriptAndLLMReal = async ({ s3Key, transcriptHint, questionTy
   }
 
   try {
-    const llmScores = await getLLMAnalysisFromBedrock({ transcriptText, questionType });
+    const llmScores = await getLLMAnalysisFromGroqLlama({ transcriptText, questionType });
     return {
       ...llmScores,
       transcriptText,
       transcriptAvailable: true,
       llmAvailable: true,
     };
-  } catch {
+  } catch (error) {
+    console.error('[InterviewIQ Evaluation][pipeline] Groq Llama evaluation failed', {
+      reason: error.message || 'unknown',
+      strictEvaluationEnabled,
+    });
+
+    if (strictEvaluationEnabled) {
+      throw new Error(`Strict evaluation failed: ${error.message || 'Bedrock unavailable'}`);
+    }
+
     return getModel1TranscriptAndLLM({ transcriptText, questionType });
   }
 };
 
 const getModel2AntiCheat = async ({ s3Key }) => {
   const hfApiKey = process.env.HUGGINGFACE_API_KEY || '';
-  const configuredModel = getEnv('INTERVIEWIQ_HF_MODEL', 'google/mediapipe-face-detection');
+  const configuredModel = getEnv('INTERVIEWIQ_HF_MODEL', 'microsoft/Florence-2-large');
   const fallbackModels = [
     configuredModel,
+    'Salesforce/blip2-opt-2.7b',
     'facebook/detr-resnet-50',
-    'hustvl/yolos-tiny',
   ].filter(Boolean);
 
   const parsePersonDetections = (prediction) => {
@@ -475,66 +596,6 @@ const getModel2AntiCheat = async ({ s3Key }) => {
 
 };
 
-const getModel3KeywordHeuristic = ({ transcriptText, keywords }) => {
-  const tokens = tokenize(transcriptText).map(stem);
-  const tokenSet = new Set(tokens);
-  const normalizedKeywords = (keywords || []).map((keyword) => stem(String(keyword).toLowerCase()));
-
-  const matchedKeywords = normalizedKeywords.filter((keyword) => tokenSet.has(keyword));
-  const missedKeywords = normalizedKeywords.filter((keyword) => !tokenSet.has(keyword));
-  const fillerCount = countFillerWords(transcriptText);
-
-  const baseScore = normalizedKeywords.length
-    ? (matchedKeywords.length / normalizedKeywords.length) * 100
-    : 0;
-
-  const penalty = fillerCount > 3 ? (fillerCount - 3) * 2 : 0;
-  const keywordScore = clamp(Math.round(baseScore - penalty), 0, 100);
-
-  return {
-    keywordScore,
-    fillerCount,
-    matchedKeywords,
-    missedKeywords,
-  };
-};
-
-const getFinalScore = ({ llmScores, keywordScores, antiCheatResult }) => {
-  const transcriptLLMRaw =
-    Number(llmScores.clarity || 0) +
-    Number(llmScores.relevance || 0) +
-    Number(llmScores.depth || 0) +
-    Number(llmScores.communication || 0) +
-    Number(llmScores.starScore || 0);
-
-  const isBehavioral = Number(llmScores.starScore || 0) > 0;
-  const llmMax = isBehavioral ? 110 : 100;
-  const llmPercent = clamp(Math.round((transcriptLLMRaw / llmMax) * 100), 0, 100);
-
-  const antiCheatUnavailable =
-    antiCheatResult?.confidenceScore === null ||
-    (Array.isArray(antiCheatResult?.flags) && antiCheatResult.flags.includes('evaluation_unavailable'));
-
-  const antiCheatScore = antiCheatUnavailable
-    ? 50
-    : antiCheatResult?.cheatDetected
-    ? clamp(100 - Number(antiCheatResult?.confidenceScore || 100), 0, 100)
-    : 100;
-
-  const keywordPercent = clamp(Number(keywordScores.keywordScore || 0), 0, 100);
-
-  const hasTranscript = Boolean(llmScores?.transcriptAvailable);
-  const hasKeywordSignal = keywordPercent > 0;
-
-  if (!hasTranscript && !hasKeywordSignal) {
-    return 0;
-  }
-
-  const finalScore = llmPercent * 0.45 + keywordPercent * 0.35 + antiCheatScore * 0.2;
-
-  return clamp(Math.round(finalScore), 0, 100);
-};
-
 const runEvaluationPipelineAsync = async ({
   userId,
   responseId,
@@ -545,10 +606,21 @@ const runEvaluationPipelineAsync = async ({
   let transcriptS3Key = null;
 
   try {
+    logEval(responseId, 'Pipeline started', {
+      userId,
+      s3Key,
+      questionId: question?.questionId,
+      questionType: question?.type,
+      strictEvaluationEnabled,
+      hasTranscriptHint: Boolean(transcriptHint),
+    });
+
     await responseRepo.update(userId, responseId, {
       status: 'processing',
       processingStartedAt: new Date().toISOString(),
     });
+
+    logEval(responseId, 'Status updated to processing');
 
     const model1 = await getModel1TranscriptAndLLMReal({
       s3Key,
@@ -556,18 +628,16 @@ const runEvaluationPipelineAsync = async ({
       questionType: question.type,
     });
 
-    const model2 = await getModel2AntiCheat({ s3Key });
-
-    const model3 = getModel3KeywordHeuristic({
-      transcriptText: model1.transcriptText,
-      keywords: question.keywords,
+    logEval(responseId, 'Model evaluation ready', {
+      transcriptAvailable: model1.transcriptAvailable,
+      llmAvailable: model1.llmAvailable,
+      transcriptLength: String(model1.transcriptText || '').length,
+      starRating: model1.starRating,
     });
 
-    const finalScore = getFinalScore({
-      llmScores: model1,
-      keywordScores: model3,
-      antiCheatResult: model2,
-    });
+    const finalScore = clamp(Math.round(Number(model1.starRating || 0) * 10) / 10, 0, 10);
+
+    logEval(responseId, 'Final score computed', { finalScore });
 
     transcriptS3Key = await putTranscriptTextToS3({
       userId,
@@ -575,28 +645,35 @@ const runEvaluationPipelineAsync = async ({
       transcriptText: model1.transcriptText,
     });
 
+    logEval(responseId, 'Transcript persisted', {
+      transcriptS3Key,
+      transcriptLength: String(model1.transcriptText || '').length,
+    });
+
     await responseRepo.update(userId, responseId, {
       status: 'completed',
       s3Key: transcriptS3Key,
       transcriptText: model1.transcriptText,
       llmScores: {
-        clarity: model1.clarity,
-        relevance: model1.relevance,
-        depth: model1.depth,
-        communication: model1.communication,
-        starScore: model1.starScore,
+        starRating: model1.starRating,
         overallFeedback: model1.overallFeedback,
         strengths: model1.strengths,
         improvements: model1.improvements,
         fillerWordCount: model1.fillerWordCount,
       },
-      keywordScores: model3,
-      antiCheatResult: model2,
+      keywordScores: {},
+      antiCheatResult: {},
       finalScore,
       completedAt: new Date().toISOString(),
     });
+
+    logEval(responseId, 'Pipeline completed successfully', { finalScore });
   } catch (error) {
     const fallbackTranscriptText = transcriptHint || '';
+
+    logEval(responseId, 'Pipeline failed', {
+      error: error.message || 'Evaluation pipeline failed',
+    });
 
     if (!transcriptS3Key && fallbackTranscriptText) {
       try {
@@ -617,11 +694,15 @@ const runEvaluationPipelineAsync = async ({
       evaluationError: error.message || 'Evaluation pipeline failed',
       completedAt: new Date().toISOString(),
     });
+
+    logEval(responseId, 'Failure persisted on response record');
   } finally {
     try {
       await deleteRecordingObject(s3Key);
+      logEval(responseId, 'Raw recording deleted from S3');
     } catch {
       // Best effort cleanup to avoid retaining raw recordings.
+      logEval(responseId, 'Raw recording cleanup skipped due to delete failure');
     }
   }
 };

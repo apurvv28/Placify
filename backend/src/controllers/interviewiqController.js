@@ -20,6 +20,25 @@ const userRepo = new UserRepository();
 
 const asDeckId = (deckNumber) => `deck-${deckNumber}`;
 
+const getResponseTimestamp = (item) =>
+  new Date(item?.completedAt || item?.recordedAt || item?.createdAt || 0).getTime();
+
+const dedupeLatestResponsesByQuestion = (responses = []) => {
+  const latestByQuestion = new Map();
+
+  for (const item of responses) {
+    const questionId = item?.questionId;
+    if (!questionId) continue;
+
+    const prev = latestByQuestion.get(questionId);
+    if (!prev || getResponseTimestamp(item) >= getResponseTimestamp(prev)) {
+      latestByQuestion.set(questionId, item);
+    }
+  }
+
+  return [...latestByQuestion.values()].sort((a, b) => getResponseTimestamp(a) - getResponseTimestamp(b));
+};
+
 const getProgress = async (req, res, next) => {
   try {
     const progress = await progressRepo.findOrCreate(req.userId);
@@ -175,18 +194,24 @@ const getDeckResults = async (req, res, next) => {
       return res.status(404).json({ message: 'Deck not found.' });
     }
 
+    const progressBefore = await progressRepo.findOrCreate(req.userId);
+    const previousBadgeIds = new Set((progressBefore.badges || []).map((badge) => badge.id));
+
     await finalizeDeckIfEligible(req.userId, deckNumber);
 
     const refreshedDeck = await deckRepo.findByUserAndDeckNumber(req.userId, deckNumber);
     const responses = await responseRepo.listByUserAndDeck(req.userId, deckId);
+    const latestResponses = dedupeLatestResponsesByQuestion(responses);
 
     const progress = await progressRepo.findOrCreate(req.userId);
+    const newBadges = (progress.badges || []).filter((badge) => !previousBadgeIds.has(badge.id));
 
     return res.status(200).json({
       deck: refreshedDeck,
-      responses,
+      responses: latestResponses,
       totalDeckScore: refreshedDeck?.totalScore ?? null,
       badges: progress.badges || [],
+      newBadges,
     });
   } catch (error) {
     return next(error);

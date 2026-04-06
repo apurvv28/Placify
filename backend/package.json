@@ -8,7 +8,9 @@
     "dev": "nodemon index.js",
     "test": "echo \"No tests configured\"",
     "interviewiq:import:dry": "node src/scripts/importInterviewIQQuestions.js",
-    "interviewiq:import": "node src/scripts/importInterviewIQQuestions.js --apply"
+    "interviewiq:import": "node src/scripts/importInterviewIQQuestions.js --apply",
+    "interviewiq:reset:all:dry": "node src/scripts/resetInterviewIQAllUsers.js",
+    "interviewiq:reset:all": "node src/scripts/resetInterviewIQAllUsers.js --apply"
   },
   "keywords": [],
   "author": "",

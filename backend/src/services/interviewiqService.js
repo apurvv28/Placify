@@ -7,6 +7,7 @@ const questionRepo = new InterviewIQQuestionRepository();
 const progressRepo = new InterviewIQProgressRepository();
 const deckRepo = new InterviewIQDeckRepository();
 const responseRepo = new InterviewIQResponseRepository();
+const PASSING_DECK_STAR_RATING = 5;
 
 const DECK_MILESTONE_BADGES = {
   1: { id: 'deck-1', name: 'Deck 1 Complete', icon: '🥉', description: 'Completed your first InterviewIQ deck' },
@@ -234,11 +235,35 @@ const finalizeDeckIfEligible = async (userId, deckNumber) => {
 
   const responses = await responseRepo.listByUserAndDeck(userId, deck.deckId);
   const completedResponses = responses.filter((response) => response.status === 'completed');
-  if (completedResponses.length < 3) return null;
+
+  const latestByQuestion = new Map();
+  for (const item of completedResponses) {
+    const key = item.questionId;
+    if (!key) continue;
+
+    const prev = latestByQuestion.get(key);
+    const itemTime = new Date(item.completedAt || item.recordedAt || item.createdAt || 0).getTime();
+    const prevTime = prev ? new Date(prev.completedAt || prev.recordedAt || prev.createdAt || 0).getTime() : -1;
+
+    if (!prev || itemTime >= prevTime) {
+      latestByQuestion.set(key, item);
+    }
+  }
+
+  const scoredResponses = [...latestByQuestion.values()];
+  if (scoredResponses.length < 3) return null;
 
   const totalScore = Math.round(
-    completedResponses.reduce((acc, item) => acc + Number(item.finalScore || 0), 0) / completedResponses.length
-  );
+    (scoredResponses.reduce((acc, item) => acc + Number(item.finalScore || 0), 0) / scoredResponses.length) * 10
+  ) / 10;
+
+  if (!(totalScore > PASSING_DECK_STAR_RATING)) {
+    return deckRepo.update(userId, deckNumber, {
+      status: 'in_progress',
+      completedAt: null,
+      totalScore,
+    });
+  }
 
   const completedDeck = await deckRepo.update(userId, deckNumber, {
     status: 'completed',
@@ -256,13 +281,13 @@ const finalizeDeckIfEligible = async (userId, deckNumber) => {
     badges = awardBadgeIfMissing(badges, DECK_MILESTONE_BADGES[deckNumber]);
   }
 
-  if (totalScore >= 90) {
+  if (totalScore >= 9) {
     badges = awardBadgeIfMissing(badges, STATIC_BADGES.PERFECT_ROUND);
   }
 
   const allResponses = await responseRepo.listByUser(userId);
   const behavioralStarMasterCount = allResponses.filter(
-    (item) => item.status === 'completed' && item.questionType === 'behavioral' && Number(item.llmScores?.starScore || 0) >= 10
+    (item) => item.status === 'completed' && item.questionType === 'behavioral' && Number(item.llmScores?.starRating || 0) >= 10
   ).length;
 
   if (behavioralStarMasterCount >= 10) {
@@ -310,13 +335,13 @@ const buildWeakAreaHeatmap = async (userId) => {
   }
 
   const categories = [...categoryMap.entries()].map(([category, scores]) => {
-    const averageScore = Math.round(scores.reduce((acc, score) => acc + score, 0) / scores.length);
+    const averageScore = Math.round((scores.reduce((acc, score) => acc + score, 0) / scores.length) * 10) / 10;
     return {
       category,
       averageScore,
       attempts: scores.length,
       percentileColor:
-        averageScore >= 80 ? 'bg-emerald-500/30' : averageScore >= 60 ? 'bg-amber-500/30' : 'bg-rose-500/30',
+        averageScore >= 8 ? 'bg-emerald-500/30' : averageScore >= 6 ? 'bg-amber-500/30' : 'bg-rose-500/30',
     };
   });
 

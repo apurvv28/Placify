@@ -21,7 +21,7 @@ export default function WeakAreaHeatmap({ heatmap }) {
         {(heatmap.categories || []).map((cell) => (
           <div key={cell.category} className={`rounded-xl border border-white/10 p-3 ${cell.percentileColor}`}>
             <p className="text-sm text-stone-100">{cell.category}</p>
-            <p className="text-lg text-orange-200 font-semibold">{cell.averageScore}%</p>
+            <p className="text-lg text-orange-200 font-semibold">{Number(cell.averageScore || 0).toFixed(1)}/10</p>
             <p className="text-xs text-stone-400">{cell.attempts} attempts</p>
           </div>
         ))}

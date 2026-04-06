@@ -80,7 +80,7 @@ class InterviewIQResponseRepository {
 
     const items = result.Items || [];
     return items
-      .filter((item) => Number(item.finalScore || 0) >= 95 && item.status === 'completed')
+      .filter((item) => Number(item.finalScore || 0) >= 9.5 && item.status === 'completed')
       .sort((a, b) => Number(b.finalScore || 0) - Number(a.finalScore || 0))
       .slice(0, limit);
   }

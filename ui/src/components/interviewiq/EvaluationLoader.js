@@ -1,9 +1,9 @@
 import React from 'react';
 
 const steps = [
-  'Model 1: Transcript + LLM analysis',
-  'Model 2: Anti-cheat frame checks',
-  'Model 3: Keyword heuristic scoring',
+  'Transcribing your answer',
+  'Applying strict LLM grading rubric',
+  'Computing star rating out of 10',
 ];
 
 export default function EvaluationLoader() {

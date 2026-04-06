@@ -15,6 +15,7 @@ export default function InterviewIQDeckSessionPage() {
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0);
   const [responses, setResponses] = useState([]);
   const [resultsPayload, setResultsPayload] = useState(null);
+  const [rewardBadge, setRewardBadge] = useState(null);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -73,6 +74,9 @@ export default function InterviewIQDeckSessionPage() {
 
       const deckResults = await interviewIqApi.getDeckResults(deckNumber);
       setResultsPayload(deckResults);
+      if (Array.isArray(deckResults?.newBadges) && deckResults.newBadges.length > 0) {
+        setRewardBadge(deckResults.newBadges[0]);
+      }
       setStep('results');
     } catch (err) {
       setError(err.message || 'Failed during recording upload/evaluation.');
@@ -137,8 +141,10 @@ export default function InterviewIQDeckSessionPage() {
         {step === 'results' ? (
           <div className="space-y-4">
             <div className="rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-5">
-              <p className="text-emerald-200 text-sm">Deck Completed</p>
-              <p className="text-stone-100 text-2xl font-bold mt-1">Total Score: {resultsPayload?.totalDeckScore ?? '-'}%</p>
+              <p className="text-emerald-200 text-sm">
+                {resultsPayload?.deck?.status === 'completed' ? 'Deck Completed' : 'Deck Not Completed'}
+              </p>
+              <p className="text-stone-100 text-2xl font-bold mt-1">Average Rating: {resultsPayload?.totalDeckScore ?? '-'}/10</p>
             </div>
 
             {(resultsPayload?.responses || responses).map((response) => (
@@ -146,6 +152,25 @@ export default function InterviewIQDeckSessionPage() {
             ))}
 
             <BadgeShelf badges={resultsPayload?.badges || []} />
+          </div>
+        ) : null}
+
+        {rewardBadge ? (
+          <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+            <div className="absolute inset-0 bg-black/75" onClick={() => setRewardBadge(null)} />
+            <div className="relative w-full max-w-md rounded-2xl border border-orange-300/40 bg-zinc-950 p-6 text-center shadow-2xl">
+              <p className="text-xs uppercase tracking-widest text-orange-300">Reward Unlocked</p>
+              <p className="mt-3 text-5xl">{rewardBadge.icon || '🏅'}</p>
+              <p className="mt-3 text-2xl font-bold text-stone-100">{rewardBadge.name || 'New Badge'}</p>
+              <p className="mt-2 text-sm text-stone-300">{rewardBadge.description || 'Great work. Keep going.'}</p>
+              <button
+                type="button"
+                onClick={() => setRewardBadge(null)}
+                className="mt-5 w-full rounded-lg bg-gradient-to-r from-orange-500 to-amber-400 px-4 py-2 font-semibold text-black"
+              >
+                Awesome
+              </button>
+            </div>
           </div>
         ) : null}
         </div>

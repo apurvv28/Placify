@@ -65,7 +65,7 @@ export default function InterviewIQHistoryPage() {
             <div key={row.deckNumber} className="rounded-xl border border-white/10 bg-white/5 p-4">
               <div className="flex items-center justify-between gap-3">
                 <p className="text-stone-100 font-semibold">Deck {row.deckNumber}</p>
-                <p className="text-orange-300 font-semibold">{row.score}%</p>
+                <p className="text-orange-300 font-semibold">{Number(row.score || 0).toFixed(1)}/10</p>
               </div>
               <p className="text-xs text-stone-400 mt-1">{row.completedAt ? new Date(row.completedAt).toLocaleString() : 'Pending completion timestamp'}</p>
               <p className="text-sm text-stone-300 mt-2">Responses: {row.responses.length}</p>

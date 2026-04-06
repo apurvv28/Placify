@@ -127,8 +127,8 @@ export default function InterviewIQDashboardPage() {
                   longestStreak={Number(progress?.streakData?.longestStreak || 0)}
                 />
                 <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                  <p className="text-stone-100 font-semibold">Total Score</p>
-                  <p className="text-3xl mt-2 font-bold text-orange-300">{Number(progress?.totalScore || 0)}</p>
+                  <p className="text-stone-100 font-semibold">Total Rating Points</p>
+                  <p className="text-3xl mt-2 font-bold text-orange-300">{Number(progress?.totalScore || 0).toFixed(1)}</p>
                 </div>
               </div>
             </div>
