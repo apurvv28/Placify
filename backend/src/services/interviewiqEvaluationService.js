@@ -40,6 +40,11 @@ const FILLER_WORDS = ['um', 'uh', 'like', 'you know', 'basically'];
 const strictEvaluationEnabled = getEnv('INTERVIEWIQ_STRICT_EVALUATION', 'true').toLowerCase() !== 'false';
 const GROQ_CHAT_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const GROQ_TRANSCRIBE_URL = 'https://api.groq.com/openai/v1/audio/transcriptions';
+const MAX_EVAL_CONCURRENCY = Number(getEnv('INTERVIEWIQ_EVAL_MAX_CONCURRENT', '4')) || 4;
+const MAX_EVAL_QUEUE_SIZE = Number(getEnv('INTERVIEWIQ_EVAL_MAX_QUEUE', '200')) || 200;
+
+const evalQueue = [];
+let activeEvaluations = 0;
 
 const logEval = (responseId, message, details = null) => {
   const prefix = `[InterviewIQ Evaluation][response:${responseId}] ${message}`;
@@ -596,7 +601,7 @@ const getModel2AntiCheat = async ({ s3Key }) => {
 
 };
 
-const runEvaluationPipelineAsync = async ({
+const runEvaluationPipelineTask = async ({
   userId,
   responseId,
   s3Key,
@@ -707,6 +712,61 @@ const runEvaluationPipelineAsync = async ({
   }
 };
 
+const processEvaluationQueue = () => {
+  while (activeEvaluations < MAX_EVAL_CONCURRENCY && evalQueue.length > 0) {
+    const job = evalQueue.shift();
+    activeEvaluations += 1;
+
+    runEvaluationPipelineTask(job.payload)
+      .catch((error) => {
+        console.error('[InterviewIQ Evaluation][queue] Unexpected execution error', {
+          jobId: job.id,
+          error: error?.message || 'unknown',
+        });
+      })
+      .finally(() => {
+        activeEvaluations = Math.max(0, activeEvaluations - 1);
+        processEvaluationQueue();
+      });
+  }
+};
+
+const hasEvaluationCapacity = () => evalQueue.length < MAX_EVAL_QUEUE_SIZE;
+
+const getEvaluationQueueStats = () => ({
+  active: activeEvaluations,
+  queued: evalQueue.length,
+  maxConcurrent: MAX_EVAL_CONCURRENCY,
+  maxQueue: MAX_EVAL_QUEUE_SIZE,
+});
+
+const enqueueEvaluationPipeline = (payload) => {
+  if (!hasEvaluationCapacity()) {
+    return {
+      accepted: false,
+      reason: 'queue_full',
+      stats: getEvaluationQueueStats(),
+    };
+  }
+
+  const job = {
+    id: randomUUID(),
+    payload,
+    queuedAt: Date.now(),
+  };
+
+  evalQueue.push(job);
+  processEvaluationQueue();
+
+  return {
+    accepted: true,
+    jobId: job.id,
+    stats: getEvaluationQueueStats(),
+  };
+};
+
 module.exports = {
-  runEvaluationPipelineAsync,
+  enqueueEvaluationPipeline,
+  hasEvaluationCapacity,
+  getEvaluationQueueStats,
 };

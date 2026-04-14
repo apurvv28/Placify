@@ -96,6 +96,19 @@ export default function LoginCard({ onSwitchToSignup }) {
           />
         </div>
 
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={() => navigate('/forgot-password')}
+            className="text-sm bg-transparent border-none cursor-pointer p-0 transition-colors"
+            style={{ color: '#E8A430', fontFamily: 'DM Sans, sans-serif' }}
+            onMouseEnter={e => e.currentTarget.style.color = '#FFB95C'}
+            onMouseLeave={e => e.currentTarget.style.color = '#E8A430'}
+          >
+            Forgot password?
+          </button>
+        </div>
+
         {errorMessage && (
           <p className="text-sm" style={{ color: '#FF6B35', fontFamily: 'DM Sans, sans-serif' }}>{errorMessage}</p>
         )}

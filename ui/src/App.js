@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import LandingPage from './components/LandingPage';
 import AuthFlipPage from './components/auth/AuthFlipPage';
+import ForgotPasswordPage from './components/auth/ForgotPasswordPage';
 import DashboardPage from './components/dashboard/DashboardPage';
 import Features from './components/pages/Features';
 import Contact from './components/pages/Contact';
@@ -47,6 +48,7 @@ function App() {
           <Route path="/ats-algorithm-criteria" element={<AtsAlgorithmCriteria />} />
           <Route path="/ats-criteria" element={<AtsAlgorithmCriteria />} />
           <Route path="/auth" element={<AuthFlipPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/interviewiq" element={<InterviewIQDashboardPage />} />
           <Route path="/interviewiq/deck/:deckNumber" element={<InterviewIQDeckSessionPage />} />

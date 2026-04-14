@@ -1,6 +1,7 @@
 const express = require('express');
 const multer = require('multer');
 const { analyzeResume } = require('../controllers/atsController');
+const { atsRateLimit } = require('../middlewares/aiRateLimitMiddleware');
 
 const router = express.Router();
 
@@ -24,6 +25,6 @@ const upload = multer({
   fileFilter,
 });
 
-router.post('/analyze', upload.single('resume'), analyzeResume);
+router.post('/analyze', atsRateLimit, upload.single('resume'), analyzeResume);
 
 module.exports = router;

@@ -1,6 +1,7 @@
 const express = require('express');
 const multer = require('multer');
 const protect = require('../middlewares/authMiddleware');
+const { interviewUploadRateLimit } = require('../middlewares/aiRateLimitMiddleware');
 const {
   getProgress,
   getDeck,
@@ -50,7 +51,7 @@ const upload = multer({
 router.get('/progress', protect, getProgress);
 router.get('/deck/:deckNumber', protect, getDeck);
 router.post('/deck/:deckNumber/start', protect, startDeck);
-router.post('/response/upload', protect, upload.single('recording'), uploadResponse);
+router.post('/response/upload', protect, interviewUploadRateLimit, upload.single('recording'), uploadResponse);
 router.get('/response/:responseId', protect, getResponseResult);
 router.get('/deck/:deckNumber/results', protect, getDeckResults);
 router.get('/heatmap', protect, getHeatmap);

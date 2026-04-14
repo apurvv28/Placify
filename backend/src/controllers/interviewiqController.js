@@ -3,7 +3,11 @@ const { v4: uuidv4 } = require('uuid');
 const UserRepository = require('../repositories/UserRepository');
 const { SAMPLE_INTERVIEWIQ_QUESTIONS } = require('../data/interviewiqQuestions');
 const { uploadInterviewRecordingBuffer } = require('../config/interviewiqS3');
-const { runEvaluationPipelineAsync } = require('../services/interviewiqEvaluationService');
+const {
+  enqueueEvaluationPipeline,
+  hasEvaluationCapacity,
+  getEvaluationQueueStats,
+} = require('../services/interviewiqEvaluationService');
 const {
   questionRepo,
   progressRepo,
@@ -90,6 +94,14 @@ const uploadResponse = async (req, res, next) => {
   try {
     const { questionId, deckId, deckNumber, transcriptHint } = req.body || {};
 
+    if (!hasEvaluationCapacity()) {
+      const stats = getEvaluationQueueStats();
+      return res.status(429).json({
+        message: 'Interview evaluation queue is busy. Please try again shortly.',
+        queue: stats,
+      });
+    }
+
     if (!req.file) {
       return res.status(400).json({ message: 'Recording file is required.' });
     }
@@ -149,20 +161,32 @@ const uploadResponse = async (req, res, next) => {
       createdAt: nowIso,
     });
 
-    setImmediate(() => {
-      runEvaluationPipelineAsync({
-        userId: req.userId,
-        responseId,
-        s3Key: uploadResult.key,
-        question,
-        transcriptHint: typeof transcriptHint === 'string' ? transcriptHint : '',
-      });
+    const enqueueResult = enqueueEvaluationPipeline({
+      userId: req.userId,
+      responseId,
+      s3Key: uploadResult.key,
+      question,
+      transcriptHint: typeof transcriptHint === 'string' ? transcriptHint : '',
     });
+
+    if (!enqueueResult.accepted) {
+      await responseRepo.update(req.userId, responseId, {
+        status: 'failed',
+        evaluationError: 'Evaluation queue is full. Please retry upload shortly.',
+        completedAt: new Date().toISOString(),
+      });
+
+      return res.status(429).json({
+        message: 'Interview evaluation queue is busy. Please try again shortly.',
+        queue: enqueueResult.stats,
+      });
+    }
 
     return res.status(202).json({
       message: 'Response uploaded. Evaluation queued.',
       responseId,
       status: 'pending',
+      queue: enqueueResult.stats,
     });
   } catch (error) {
     return next(error);

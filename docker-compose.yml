@@ -1,0 +1,24 @@
+services:
+  backend:
+    image: apurv28/placify-backend:latest
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    env_file:
+      - ./backend/.env
+    ports:
+      - "5000:5000"
+    restart: unless-stopped
+
+  frontend:
+    image: apurv28/placify-frontend:latest
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+      args:
+        REACT_APP_API_URL: http://localhost:5000
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+    restart: unless-stopped
