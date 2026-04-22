@@ -182,7 +182,7 @@ export default function DashboardPage() {
       case 'ats-analyzer': return <ATSAnalyzerSection />;
       case 'resume-builder': return <ResumeBuilderSection />;
       case 'chat': return <ChatSection preselectedUser={preselectedChatUser} />;
-      case 'placed-resumes': return <PlacedResumesSection />;
+      case 'placed-resumes': return <PlacedResumesSection user={user} />;
       case 'profile': return <UserProfileSection user={user} onProfileUpdate={(u) => { setUser(u); localStorage.setItem('placifyUser', JSON.stringify(u)); }} />;
       default:
         return (

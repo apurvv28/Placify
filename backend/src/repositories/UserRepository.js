@@ -103,13 +103,16 @@ class UserRepository {
       const expressionAttributeValues = {
         ':updatedAt': now,
       };
+      const expressionAttributeNames = {};
       let counter = 0;
 
       for (const [key, value] of Object.entries(updateData)) {
         if (key !== 'userId') {
           counter++;
+          const nameKey = `#attr${counter}`;
           const placeholder = `:val${counter}`;
-          updateFields.push(`${key} = ${placeholder}`);
+          expressionAttributeNames[nameKey] = key;
+          updateFields.push(`${nameKey} = ${placeholder}`);
           expressionAttributeValues[placeholder] = value;
         }
       }
@@ -124,6 +127,7 @@ class UserRepository {
         TableName: TABLES.USERS,
         Key: { userId },
         UpdateExpression: `SET ${updateFields.join(', ')}`,
+        ExpressionAttributeNames: expressionAttributeNames,
         ExpressionAttributeValues: expressionAttributeValues,
         ReturnValues: 'ALL_NEW',
       }));

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 const FILTERS = ['All', '2026', '2025'];
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5000';
@@ -73,7 +73,7 @@ function UploadResumeModal({ onClose, onSuccess }) {
   );
 }
 
-export default function PlacedResumesSection() {
+export default function PlacedResumesSection({ user: currentUser }) {
   const [filter, setFilter] = useState('All');
   const [selectedResume, setSelectedResume] = useState(null);
   const [showUploadModal, setShowUploadModal] = useState(false);
@@ -83,9 +83,17 @@ export default function PlacedResumesSection() {
   const [isAddingComment, setIsAddingComment] = useState(false);
 
   const token = localStorage.getItem('placifyToken');
-  const user = JSON.parse(localStorage.getItem('placifyUser') || 'null');
+  const storedUser = (() => {
+    try {
+      const raw = localStorage.getItem('placifyUser');
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  })();
+  const user = currentUser || storedUser;
 
-  const fetchResumes = async () => {
+  const loadResumes = useCallback(async () => {
     try {
       const res = await fetch(`${API_BASE}/api/resumes/all`);
       const data = await res.json();
@@ -95,7 +103,7 @@ export default function PlacedResumesSection() {
         if (user?.id) setLikedResumes(new Set(mappedResumes.filter(r => r.likes && r.likes.includes(user.id)).map(r => r.id)));
       }
     } catch { /* */ }
-  };
+  }, [user?.id]);
 
   const recordView = async (resumeId) => {
     try {
@@ -151,7 +159,7 @@ export default function PlacedResumesSection() {
     } catch { /* */ }
   };
 
-  useEffect(() => { fetchResumes(); }, []);
+  useEffect(() => { loadResumes(); }, [loadResumes]);
 
   const openResume = (resume) => {
     setSelectedResume(resume);
@@ -356,6 +364,13 @@ export default function PlacedResumesSection() {
             </div>
           </div>
         </div>
+      )}
+
+      {showUploadModal && (
+        <UploadResumeModal
+          onClose={() => setShowUploadModal(false)}
+          onSuccess={loadResumes}
+        />
       )}
     </div>
   );
