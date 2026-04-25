@@ -46,7 +46,20 @@ const dedupeLatestResponsesByQuestion = (responses = []) => {
 const getProgress = async (req, res, next) => {
   try {
     const progress = await progressRepo.findOrCreate(req.userId);
-    return res.status(200).json(progress);
+    
+    // Fetch all decks to include their scores
+    const decks = await deckRepo.listByUser(req.userId);
+    const deckScores = {};
+    decks.forEach((deck) => {
+      if (deck.deckNumber && deck.totalScore !== null && deck.totalScore !== undefined) {
+        deckScores[deck.deckNumber] = deck.totalScore;
+      }
+    });
+    
+    return res.status(200).json({
+      ...progress,
+      deckScores,
+    });
   } catch (error) {
     return next(error);
   }

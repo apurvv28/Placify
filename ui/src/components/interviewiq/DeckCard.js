@@ -16,7 +16,11 @@ export default function DeckCard({ deckNumber, unlocked, completed, score }) {
       </div>
 
       <p className="text-xs text-stone-400 mt-2">3 questions: easy + medium + hard</p>
-      <p className="text-sm mt-3 text-orange-300">{completed ? `Avg Rating: ${score ?? '-'}/10` : 'Not attempted yet'}</p>
+      <p className="text-sm mt-3 text-orange-300 font-semibold">
+        {completed 
+          ? `Avg Rating: ${score !== null && score !== undefined ? Number(score).toFixed(1) : '-'}/10` 
+          : 'Not attempted yet'}
+      </p>
 
       {unlocked ? (
         <Link

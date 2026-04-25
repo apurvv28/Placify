@@ -307,15 +307,31 @@ const getLLMAnalysisFromGroqLlama = async ({ transcriptText, questionType }) => 
   });
 
   const systemPrompt = [
-    'You are an expert HR evaluator.',
-    'Use strict grading standards and be conservative with high ratings.',
+    'You are an expert HR evaluator conducting unbiased interview assessments.',
+    'Evaluate each response independently without comparing to other candidates.',
+    'Use strict, consistent grading standards across all evaluations.',
     'Score the response with a single starRating from 0 to 10 (can include one decimal place).',
-    'A score of 10 should be extremely rare and reserved for exceptional answers.',
-    'Question type context is provided. For behavioral answers, enforce STAR completeness in the rating.',
+    'Rating scale: 0-3 (Poor), 4-5 (Below Average), 6-7 (Average), 8-9 (Good), 10 (Exceptional - extremely rare).',
+    'A score of 10 should be reserved only for truly exceptional, comprehensive answers with perfect structure and delivery.',
+    'For behavioral questions, enforce STAR (Situation, Task, Action, Result) completeness in the rating.',
+    'For technical questions, assess accuracy, depth, and clarity of explanation.',
+    'Provide constructive, actionable feedback in all cases.',
     'Return strict JSON with fields:',
     '{ starRating, overallFeedback, strengths, improvements, fillerWordCount }',
-    'Do not include any additional fields.',
+    'Do not include any additional fields or explanations outside the JSON.',
   ].join(' ');
+
+  const userPrompt = [
+    `Question type: ${questionType}`,
+    `Transcript:\n${transcriptText}`,
+    '',
+    'Evaluate this response objectively and provide:',
+    '1. A starRating (0-10, one decimal allowed)',
+    '2. overallFeedback (2-3 sentences summarizing the response quality)',
+    '3. strengths (array of 2-3 specific positive aspects)',
+    '4. improvements (array of 2-3 specific actionable suggestions)',
+    '5. fillerWordCount (count of filler words like um, uh, like, you know)',
+  ].join('\n');
 
   const payload = {
     model: modelId,
@@ -323,7 +339,7 @@ const getLLMAnalysisFromGroqLlama = async ({ transcriptText, questionType }) => 
       { role: 'system', content: systemPrompt },
       {
         role: 'user',
-        content: `Question type: ${questionType}\nTranscript:\n${transcriptText}`,
+        content: userPrompt,
       },
     ],
     temperature: 0,

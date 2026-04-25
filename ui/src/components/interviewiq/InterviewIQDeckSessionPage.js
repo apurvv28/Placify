@@ -84,6 +84,23 @@ export default function InterviewIQDeckSessionPage() {
     }
   };
 
+  const handleRestartQuestion = () => {
+    // Simply stay on the same question, QuestionRecorder will reset itself
+    setError('');
+  };
+
+  const handleGoBackFromQuestion = () => {
+    if (activeQuestionIndex > 0) {
+      setActiveQuestionIndex((prev) => prev - 1);
+      setError('');
+    } else {
+      setStep('overview');
+      setActiveQuestionIndex(0);
+      setResponses([]);
+      setError('');
+    }
+  };
+
   return (
     <InterviewIQLayout>
       <div className="min-h-screen px-4 py-8 sm:px-6 lg:px-10" style={{ backgroundColor: '#0A0A0A' }}>
@@ -130,9 +147,12 @@ export default function InterviewIQDeckSessionPage() {
 
         {deckData && step === 'question' && questions[activeQuestionIndex] ? (
           <QuestionRecorder
+            key={`question-${activeQuestionIndex}-${Date.now()}`}
             question={questions[activeQuestionIndex]}
             onRecorded={handleRecorded}
             onError={(message) => setError(message)}
+            onRestart={handleRestartQuestion}
+            onGoBack={handleGoBackFromQuestion}
           />
         ) : null}
 
@@ -140,16 +160,57 @@ export default function InterviewIQDeckSessionPage() {
 
         {step === 'results' ? (
           <div className="space-y-4">
-            <div className="rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-5">
-              <p className="text-emerald-200 text-sm">
-                {resultsPayload?.deck?.status === 'completed' ? 'Deck Completed' : 'Deck Not Completed'}
-              </p>
-              <p className="text-stone-100 text-2xl font-bold mt-1">Average Rating: {resultsPayload?.totalDeckScore ?? '-'}/10</p>
+            <div className="rounded-2xl border border-emerald-400/30 bg-gradient-to-br from-emerald-500/10 to-orange-500/10 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <p className="text-emerald-200 text-sm uppercase tracking-wide">
+                    {resultsPayload?.deck?.status === 'completed' ? '✓ Deck Completed' : 'Deck In Progress'}
+                  </p>
+                  <p className="text-stone-100 text-3xl font-bold mt-1">
+                    {resultsPayload?.totalDeckScore ? `${resultsPayload.totalDeckScore}/10` : '-/10'}
+                  </p>
+                </div>
+                <div className="text-5xl">
+                  {resultsPayload?.deck?.status === 'completed' ? '🎉' : '📊'}
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-white/10">
+                <div className="text-center">
+                  <p className="text-xs text-stone-400 uppercase">Questions</p>
+                  <p className="text-lg font-semibold text-stone-100">{(resultsPayload?.responses || responses).length}</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-xs text-stone-400 uppercase">Avg Score</p>
+                  <p className="text-lg font-semibold text-orange-300">
+                    {resultsPayload?.totalDeckScore ? resultsPayload.totalDeckScore.toFixed(1) : '-'}
+                  </p>
+                </div>
+                <div className="text-center">
+                  <p className="text-xs text-stone-400 uppercase">Status</p>
+                  <p className="text-lg font-semibold text-emerald-300">
+                    {resultsPayload?.deck?.status === 'completed' ? 'Pass' : 'Review'}
+                  </p>
+                </div>
+              </div>
+
+              {resultsPayload?.deck?.status !== 'completed' && (
+                <div className="mt-4 p-3 rounded-lg bg-orange-500/10 border border-orange-400/20">
+                  <p className="text-xs text-orange-200">
+                    💡 Keep practicing! Complete more questions to improve your deck score.
+                  </p>
+                </div>
+              )}
             </div>
 
-            {(resultsPayload?.responses || responses).map((response) => (
-              <ScoreBreakdown key={response.responseId} response={response} />
-            ))}
+            <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+              <p className="text-stone-100 font-semibold mb-3">Individual Question Ratings</p>
+              <div className="space-y-3">
+                {(resultsPayload?.responses || responses).map((response) => (
+                  <ScoreBreakdown key={response.responseId} response={response} />
+                ))}
+              </div>
+            </div>
 
             <BadgeShelf badges={resultsPayload?.badges || []} />
           </div>

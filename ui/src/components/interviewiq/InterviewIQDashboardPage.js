@@ -36,6 +36,7 @@ export default function InterviewIQDashboardPage() {
   const decks = useMemo(() => {
     const completedDecks = progress?.completedDecks || [];
     const completedSet = new Set(completedDecks);
+    const deckScores = progress?.deckScores || {};
     const batchIndex = Math.floor(completedDecks.length / 8);
     const startDeck = batchIndex * 8 + 1;
     const endDeck = Math.min(startDeck + 7, 100);
@@ -44,7 +45,7 @@ export default function InterviewIQDashboardPage() {
       deckNumber,
       unlocked: deckNumber <= Number(progress?.currentDeck || 1),
       completed: completedSet.has(deckNumber),
-      score: null,
+      score: deckScores[deckNumber] ?? null,
     }));
   }, [progress]);
 
